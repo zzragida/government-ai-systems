@@ -2,193 +2,171 @@
 
 class AuthManager {
     constructor() {
-        this.storageKey = 'jeju_current_user';
+        this.currentUser = null;
+        this.init();
     }
 
-    // 현재 로그인한 사용자 가져오기
-    getCurrentUser() {
-        const userStr = localStorage.getItem(this.storageKey);
-        return userStr ? JSON.parse(userStr) : null;
+    init() {
+        // 페이지 로드 시 로그인 상태 확인
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            this.currentUser = JSON.parse(savedUser);
+            this.updateAuthUI();
+        }
+        
+        // 로그인 폼 이벤트 리스너
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleLogin();
+            });
+        }
     }
 
-    // 로그인
-    login(phoneOrId, userType, department = null) {
-        let pdv = null;
+    async handleLogin() {
+        const phoneNumber = document.getElementById('login-phone').value.trim();
         
-        // 전화번호 형식인지 확인 (010으로 시작하거나 하이픈 포함)
-        const isPhone = /^(010|064|02|031|032|033|041|042|043|044|051|052|053|054|055|061|062|063)/.test(phoneOrId.replace(/-/g, ''));
+        if (!phoneNumber) {
+            alert('전화번호를 입력해주세요.');
+            return;
+        }
         
-        if (userType === 'citizen') {
-            if (isPhone) {
-                pdv = window.pdvManager.loadPDV(phoneOrId, null);
-            } else {
-                pdv = window.pdvManager.loadPDV(null, phoneOrId);
+        // PDV 존재 여부 확인
+        const pdv = this.findPDVByPhone(phoneNumber);
+        
+        if (pdv) {
+            // 기존 PDV 로그인
+            this.currentUser = pdv;
+            localStorage.setItem('currentUser', JSON.stringify(pdv));
+            this.updateAuthUI();
+            closeLoginModal();
+            
+            alert(`환영합니다, ${this.getUserDisplayName()}님!`);
+            
+            // My Page로 이동
+            if (typeof showMyPage === 'function') {
+                showMyPage();
             }
         } else {
-            if (isPhone) {
-                pdv = window.organizationManager.loadOrgPDV(phoneOrId, null, department);
-            } else {
-                pdv = window.organizationManager.loadOrgPDV(null, phoneOrId, department);
-            }
+            // PDV 없음 - 생성 모달 표시
+            closeLoginModal();
+            showPDVCreateModal(phoneNumber);
         }
+    }
 
-        if (!pdv) {
-            return { success: false, message: 'PDV를 찾을 수 없습니다. 먼저 PDV를 생성해주세요.' };
+    findPDVByPhone(phoneNumber) {
+        // PDV Manager에서 검색
+        if (window.pdvManager) {
+            const allPDVs = window.pdvManager.getAllPDVs();
+            return allPDVs.find(pdv => pdv.phoneNumber === phoneNumber);
         }
+        return null;
+    }
 
-        const user = {
-            pdvId: pdv.pdvId,
-            name: pdv.personData?.name || pdv.orgData?.name,
-            type: userType,
-            department: department || null,
-            phoneNumber: pdv.phoneNumber,
-            uniqueId: pdv.uniqueId,
-            loginTime: new Date().toISOString()
-        };
-
-        localStorage.setItem(this.storageKey, JSON.stringify(user));
+    async createPDV(pdvData) {
+        if (!window.pdvManager) {
+            alert('PDV Manager가 초기화되지 않았습니다.');
+            return;
+        }
         
-        return { success: true, user: user };
-    }
-
-    // 로그아웃
-    logout() {
-        localStorage.removeItem(this.storageKey);
-        return true;
-    }
-
-    // 로그인 여부 확인
-    isLoggedIn() {
-        return this.getCurrentUser() !== null;
-    }
-}
-
-// 전역 인스턴스 생성
-window.authManager = new AuthManager();
-
-// UI 업데이트
-function updateAuthUI() {
-    const user = window.authManager.getCurrentUser();
-    const loggedOut = document.getElementById('auth-logged-out');
-    const loggedIn = document.getElementById('auth-logged-in');
-    const userName = document.getElementById('auth-user-name');
-    const mypageTab = document.getElementById('mypage-tab');
-    
-    if (user) {
-        loggedOut.style.display = 'none';
-        loggedIn.style.display = 'flex';
-        userName.textContent = user.name;
-        if (mypageTab) mypageTab.style.display = 'block';
-    } else {
-        loggedOut.style.display = 'flex';
-        loggedIn.style.display = 'none';
-        if (mypageTab) mypageTab.style.display = 'none';
-    }
-}
-
-// 로그인 모달 열기
-function showLoginModal() {
-    document.getElementById('login-modal').classList.add('show');
-}
-
-// 로그인 모달 닫기
-function closeLoginModal() {
-    document.getElementById('login-modal').classList.remove('show');
-    document.getElementById('login-form').reset();
-    document.getElementById('org-dept-field').style.display = 'none';
-}
-
-// 로그인 처리
-function handleLogin(e) {
-    e.preventDefault();
-    
-    const phone = document.getElementById('login-phone').value.trim();
-    const id = document.getElementById('login-id').value.trim();
-    const type = document.getElementById('login-type').value;
-    const dept = document.getElementById('login-dept').value.trim();
-    
-    if (!phone && !id) {
-        alert('휴대폰 번호 또는 고유 아이디를 입력해주세요.');
-        return;
-    }
-    
-    const identifier = phone || id;
-    const department = type === 'organization' ? dept : null;
-    
-    const result = window.authManager.login(identifier, type, department);
-    
-    if (result.success) {
-        closeLoginModal();
-        updateAuthUI();
-        alert(`환영합니다, ${result.user.name}님!`);
+        // PDV 생성
+        const pdvId = window.pdvManager.generatePDVId();
+        const newPDV = {
+            pdvId: pdvId,
+            phoneNumber: pdvData.phoneNumber,
+            type: pdvData.type,
+            createdAt: new Date().toISOString(),
+            documents: [],
+            activities: []
+        };
+        
+        // 타입별 데이터 추가
+        if (pdvData.type === 'citizen') {
+            newPDV.personData = pdvData.personData;
+        } else if (pdvData.type === 'organization') {
+            newPDV.orgData = pdvData.orgData;
+        }
+        
+        // 저장
+        window.pdvManager.savePDV(newPDV);
+        
+        // 자동 로그인
+        this.currentUser = newPDV;
+        localStorage.setItem('currentUser', JSON.stringify(newPDV));
+        this.updateAuthUI();
         
         // My Page로 이동
-        const mypageTab = document.querySelector('[data-tab="mypage"]');
-        if (mypageTab) {
-            mypageTab.click();
+        if (typeof showMyPage === 'function') {
+            showMyPage();
         }
-    } else {
-        alert(result.message);
     }
-}
 
-// 로그아웃
-function logout() {
-    if (confirm('로그아웃 하시겠습니까?')) {
-        window.authManager.logout();
-        updateAuthUI();
+    getUserDisplayName() {
+        if (!this.currentUser) return '';
         
-        // 홈으로 이동
-        const homeTab = document.querySelector('[data-tab="overview"]');
-        if (homeTab) {
-            homeTab.click();
+        if (this.currentUser.type === 'citizen') {
+            return this.currentUser.personData?.name || '도민';
+        } else {
+            return this.currentUser.orgData?.name || '단체';
+        }
+    }
+
+    getCurrentUser() {
+        return this.currentUser;
+    }
+
+    updateAuthUI() {
+        const loggedIn = document.getElementById('auth-logged-in');
+        const loggedOut = document.getElementById('auth-logged-out');
+        const mypageTab = document.getElementById('mypage-tab');
+        
+        if (this.currentUser) {
+            if (loggedOut) loggedOut.style.display = 'none';
+            if (loggedIn) {
+                loggedIn.style.display = 'flex';
+                const displayName = this.getUserDisplayName();
+                const mypageBtn = loggedIn.querySelector('.mypage-btn');
+                if (mypageBtn) {
+                    mypageBtn.textContent = `${displayName} My Page`;
+                }
+            }
+            if (mypageTab) mypageTab.style.display = 'inline-block';
+        } else {
+            if (loggedOut) loggedOut.style.display = 'flex';
+            if (loggedIn) loggedIn.style.display = 'none';
+            if (mypageTab) mypageTab.style.display = 'none';
+        }
+    }
+
+    logout() {
+        this.currentUser = null;
+        localStorage.removeItem('currentUser');
+        this.updateAuthUI();
+        
+        // 메인 탭으로 이동
+        if (typeof switchTab === 'function') {
+            switchTab('dochung');
         }
         
         alert('로그아웃되었습니다.');
     }
 }
 
-// 사용자 유형 변경 시 부서 필드 표시/숨김
-function toggleDeptField() {
-    const type = document.getElementById('login-type').value;
-    const deptField = document.getElementById('org-dept-field');
-    
-    if (type === 'organization') {
-        deptField.style.display = 'block';
-    } else {
-        deptField.style.display = 'none';
+// 전역 함수들
+function openLoginModal() {
+    document.getElementById('login-modal').style.display = 'block';
+}
+
+function closeLoginModal() {
+    document.getElementById('login-modal').style.display = 'none';
+}
+
+function logout() {
+    if (window.authManager) {
+        window.authManager.logout();
     }
 }
 
-// 페이지 로드 시 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    updateAuthUI();
-    
-    // 로그인 폼 이벤트
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
-    
-    // 사용자 유형 변경 이벤트
-    const loginType = document.getElementById('login-type');
-    if (loginType) {
-        loginType.addEventListener('change', toggleDeptField);
-    }
-    
-    // 모달 외부 클릭 시 닫기
-    const loginModal = document.getElementById('login-modal');
-    if (loginModal) {
-        loginModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeLoginModal();
-            }
-        });
-    }
-});
-
-// 전역 함수 노출
-window.showLoginModal = showLoginModal;
-window.closeLoginModal = closeLoginModal;
-window.logout = logout;
-window.updateAuthUI = updateAuthUI;
+// 전역 인스턴스 생성
+window.authManager = new AuthManager();
