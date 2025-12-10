@@ -1,0 +1,45 @@
+# API 키 파일들
+jeju-do/js/config.js
+national-financial-statements/js/config.js
+securities/backend/server.py
+openhash-system/api/consultation.php
+
+# config 파일들
+**/config.js
+**/.env
+**/.env.local
+
+# Python 캐시
+**/__pycache__/
+**/*.pyc
+
+# Node modules
+**/node_modules/
+
+# 로그 파일
+*.log
+
+# 백업 파일
+*.bak
+*.backup
+*.broken
+**/backup_*/
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# 백업 파일 패턴
+*.backup*
+*.bak
+*.bak2
+*_backup_*/
+*.broken
+
+# 특정 백업 디렉토리
+k12_backup_*/
+market_backup_*/
+mof_backup_*/
+openhash-system.backup_*/
+presidential-office_backup_*/
+securities_backup_*/

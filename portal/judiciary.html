@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사법부 AI 자동화 시스템</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        .warning-bar {
+            background: #4B5563;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        .section {
+            margin-bottom: 50px;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+        .section-title .icon {
+            font-size: 24px;
+        }
+        .section-title h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .section-title .count {
+            color: #666;
+            font-size: 18px;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        .court-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .court-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
+        .court-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #059669;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .ai-badge::before {
+            content: "✓";
+            font-size: 16px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .back-button:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="warning-bar">
+        ⚠️ 본 사이트는 OpenHash 기술의 실증을 위한 데모 시스템입니다 (실제 정부 서비스 아님)
+    </div>
+
+    <div class="container">
+        <a href="/portal/" class="back-button">← 국가 포털로 돌아가기</a>
+        
+        <div class="header">
+            <h1>사법부 AI 자동화 시스템</h1>
+            <p>Judiciary AI Automation Systems</p>
+        </div>
+
+        <!-- 대법원 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">⚖️</span>
+                <h2>대법원</h2>
+                <span class="count">(1개)</span>
+            </div>
+            <div class="card-grid">
+                <div class="court-card" onclick="window.open('/supreme-court/', '_blank')">
+                    <h3>대법원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 각급 법원 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🏛️</span>
+                <h2>각급 법원</h2>
+                <span class="count">(3개)</span>
+            </div>
+            <div class="card-grid">
+                <div class="court-card" onclick="window.open('/high-courts/', '_blank')">
+                    <h3>고등법원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/district-courts/', '_blank')">
+                    <h3>지방법원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/patent-court/', '_blank')">
+                    <h3>특허법원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 부속 기관 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🏢</span>
+                <h2>부속 기관</h2>
+                <span class="count">(6개)</span>
+            </div>
+            <div class="card-grid">
+                <div class="court-card" onclick="window.open('/court-administration/', '_blank')">
+                    <h3>법원행정처</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/judicial-training/', '_blank')">
+                    <h3>사법연수원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/judicial-research/', '_blank')">
+                    <h3>사법정책연구원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/court-staff-training/', '_blank')">
+                    <h3>법원공무원교육원</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/court-library/', '_blank')">
+                    <h3>법원도서관</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="court-card" onclick="window.open('/sentencing-commission/', '_blank')">
+                    <h3>양형위원회</h3>
+                    <div class="ai-badge">AI</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

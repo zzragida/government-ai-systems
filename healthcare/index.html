@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오픈해시 기반 권역 의료 통합 시스템 | OpenHash Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
+        body { 
+            background-color: #f8f9fa; 
+            color: #212529;
+        }
+        .gradient-health { 
+            background: linear-gradient(135deg, #0046FF 0%, #1E40AF 50%, #0066CC 100%); 
+        }
+        .gradient-pdv { 
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); 
+        }
+        .gradient-ai { 
+            background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%); 
+        }
+        .card-hover { 
+            transition: all 0.3s ease; 
+        }
+        .card-hover:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 30px rgba(0, 70, 255, 0.2); 
+        }
+        @keyframes float { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-10px); } 
+        }
+        @keyframes pulse-glow { 
+            0%, 100% { box-shadow: 0 0 5px rgba(0, 70, 255, 0.3); } 
+            50% { box-shadow: 0 0 20px rgba(0, 70, 255, 0.5), 0 0 30px rgba(0, 70, 255, 0.3); } 
+        }
+        @keyframes hash-flow { 
+            0% { background-position: 0% 50%; } 
+            100% { background-position: 100% 50%; } 
+        }
+        .float { 
+            animation: float 3s ease-in-out infinite; 
+        }
+        .pulse-glow { 
+            animation: pulse-glow 2s infinite; 
+        }
+        .hash-flow { 
+            background: linear-gradient(90deg, #0046FF, #3b82f6, #0046FF); 
+            background-size: 200% 100%; 
+            animation: hash-flow 3s linear infinite; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .glass { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(0, 70, 255, 0.1); 
+        }
+        ::-webkit-scrollbar { 
+            width: 8px; 
+        }
+        ::-webkit-scrollbar-track { 
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb { 
+            background: #0046FF; 
+            border-radius: 4px; 
+        }
+    </style>
+    <link rel="stylesheet" href="/common/floating-chat.css">
+    <script src="/common/floating-chat.js"></script>
+</head>
+<body>
+
+    <!-- 데모 배너 -->
+        <div style="background:#4B5563;color:white;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+        <p style="font-size:14px;font-weight:600;margin:0;">⚠️ 본 사이트는 OpenHash 기술의 실증을 위한 데모 시스템입니다 (실제 정부 서비스 아님)</p>
+        <div style="display:flex;gap:20px;">
+            <a href="http://100.30.14.224/openhash-system/" style="color:white;text-decoration:none;font-size:14px;font-weight:600;display:flex;align-items:center;gap:4px;">
+                <span>Openhash</span>
+                <i class="fas fa-question-circle" style="font-size:16px;"></i>
+            </a>
+            <a href="http://100.30.14.224/national-data-registry/" style="color:white;text-decoration:underline;font-size:14px;font-weight:600;">국가 데이터처</a>
+        </div>
+    </div>
+    <div id="root"></div>
+    
+    <script type="text/babel" src="js/components/Modal.js?v=5"></script>
+    <script type="text/babel" src="js/components/Header.js?v=5"></script>
+    <script type="text/babel" src="js/components/OpenHashSection.js?v=5"></script>
+    <script type="text/babel" src="js/components/PDVSection.js?v=5"></script>
+    <script type="text/babel" src="js/components/AIConsultation.js?v=5"></script>
+    <script type="text/babel" src="js/components/SimulatorSection.js?v=5"></script>
+    <script type="text/babel" src="js/app.js?v=5"></script>
+    <script src="/shared/banner.js"></script>
+</body>
+</html>

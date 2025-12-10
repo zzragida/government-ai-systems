@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABDC 화폐 | 자산담보디지털화폐</title>
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 정부 공식 사이트 스타일 */
+        body {
+            background: #f5f6f7;
+            color: #333;
+        }
+        
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        /* 페이지 헤더 */
+        .page-header {
+            background: #fff;
+            border-bottom: 3px solid #1a56db;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+        
+        .page-subtitle {
+            font-size: 15px;
+            color: #666;
+            margin: 0;
+        }
+        
+        /* 콘텐츠 섹션 */
+        .content-section {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #1a56db;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 4px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+        
+        .section-body {
+            padding: 24px;
+        }
+        
+        /* 비교 테이블 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .comparison-table thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+        }
+        
+        .comparison-table th.label {
+            background: #fafafa;
+            width: 140px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .comparison-table .fiat-col {
+            background: #fff9f9;
+        }
+        
+        .comparison-table .abc-col {
+            background: #f6fbf6;
+        }
+        
+        .col-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .col-header .type {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .col-header .sub {
+            font-size: 12px;
+            color: #888;
+            font-weight: 400;
+        }
+        
+        /* 구조 다이어그램 */
+        .structure-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 0;
+        }
+        
+        .structure-node {
+            background: #fff;
+            border: 2px solid #1a56db;
+            border-radius: 8px;
+            padding: 16px 32px;
+            text-align: center;
+            min-width: 280px;
+        }
+        
+        .structure-node.primary {
+            background: #1a56db;
+            color: #fff;
+        }
+        
+        .structure-node.secondary {
+            background: #e8f0fe;
+            border-color: #4285f4;
+        }
+        
+        .structure-node.tertiary {
+            background: #e6f4ea;
+            border-color: #34a853;
+        }
+        
+        .node-label {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .node-desc {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .structure-arrow {
+            color: #1a56db;
+            font-size: 20px;
+        }
+        
+        .arrow-label {
+            font-size: 12px;
+            color: #666;
+            margin: 4px 0;
+        }
+        
+        /* 자회사 목록 */
+        .subsidiary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .subsidiary-category {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 16px;
+        }
+        
+        .category-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a56db;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .category-list li {
+            font-size: 13px;
+            color: #333;
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-list li::before {
+            content: "•";
+            color: #1a56db;
+            font-weight: bold;
+        }
+        
+        /* 정보 박스 */
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #1a56db;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box.example {
+            background: #f8f9fa;
+            border-left-color: #666;
+        }
+        
+        .info-box-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a56db;
+            margin-bottom: 8px;
+        }
+        
+        .info-box.example .info-box-title {
+            color: #333;
+        }
+        
+        .info-box-content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+        }
+        
+        .info-box-content strong {
+            color: #1a56db;
+        }
+        
+        /* 플로우 차트 */
+        .flow-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .flow-step {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .flow-step.highlight {
+            background: #e8f0fe;
+            border-color: #1a56db;
+        }
+        
+        .flow-step-num {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .flow-step-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .flow-arrow {
+            color: #1a56db;
+            font-size: 16px;
+        }
+        
+        /* 분배 섹션 */
+        .distribution-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .chart-wrapper {
+            max-width: 180px;
+            margin: 0 auto;
+        }
+        
+        .distribution-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .distribution-table th,
+        .distribution-table td {
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .distribution-table thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .distribution-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        .color-box {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .color-box.gov { background: #1a56db; }
+        .color-box.dev { background: #34a853; }
+        
+        /* 요약 박스 */
+        .summary-section {
+            background: #1a56db;
+            color: #fff;
+            padding: 32px;
+            text-align: center;
+        }
+        
+        .summary-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .summary-text {
+            font-size: 15px;
+            line-height: 1.8;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .subsidiary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .distribution-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .flow-chart {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="top-header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>EGCT 거래소</h1>
+            <div class="header-buttons" style="display:flex; gap:12px;">
+                <a href="http://100.30.14.224/portal/" class="header-btn" style="background:rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:14px; display:flex; align-items:center; gap:6px; transition:background 0.2s;"><i class="fas fa-question-circle"></i> 포털</a>
+                <a href="http://100.30.14.224/openhash-system/" class="header-btn" style="background:rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:14px; display:flex; align-items:center; gap:6px; transition:background 0.2s;"><i class="fas fa-question-circle"></i> OpenHash</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <div class="tab-nav-inner">
+            <a href="trading.html" class="tab"><i class="fas fa-exchange-alt"></i>EGCT 거래</a>
+            <a href="hashchain-demo.html" class="tab"><i class="fas fa-link"></i>오픈해시</a>
+            <a href="abdc.html" class="tab active"><i class="fas fa-gem"></i>ABDC 화폐</a>
+            <a href="pool.html" class="tab"><i class="fas fa-cubes"></i>자산 POOL</a>
+            <a href="exchange.html" class="tab"><i class="fas fa-chart-line"></i>자산 거래소</a>
+            <a href="holders.html" class="tab"><i class="fas fa-users"></i>EGCT 보유 현황</a>
+            <a href="prices.html" class="tab"><i class="fas fa-chart-line"></i>가격 동향</a>
+            <a href="mypage.html" class="tab"><i class="fas fa-user-circle"></i>My Page</a>
+            <a href="pdv.html" class="tab"><i class="fas fa-vault"></i>My PDV</a>
+        </div>
+    </div>
+
+    <div class="page-container">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+            <h1 class="page-title">ABDC(자산담보디지털화폐) 개요</h1>
+            <p class="page-subtitle">Asset Based Digital Currency · 실물 자산이 가치를 보장하는 디지털 화폐</p>
+        </div>
+
+        <!-- 섹션 1: 법정화폐 vs ABDC -->
+        <div class="content-section">
+            <div class="section-header">
+                <span class="section-num">1</span>
+                <h2 class="section-title">법정화폐와 자산담보화폐 비교</h2>
+            </div>
+            <div class="section-body">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th class="label">구분</th>
+                            <th class="fiat-col">
+                                <div class="col-header">
+                                    <span class="type">법정화폐 (Fiat)</span>
+                                    <span class="sub">달러, 원화, 엔화</span>
+                                </div>
+                            </th>
+                            <th class="abc-col">
+                                <div class="col-header">
+                                    <span class="type">ABDC</span>
+                                    <span class="sub">EGCT</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="label">가치 보장</th>
+                            <td class="fiat-col">국가(정부)가 보장</td>
+                            <td class="abc-col">실물 자산(주식/채권)이 보장</td>
+                        </tr>
+                        <tr>
+                            <th class="label">가치의 근거</th>
+                            <td class="fiat-col">조세권(Taxing Power)</td>
+                            <td class="abc-col">기업 자산 가치</td>
+                        </tr>
+                        <tr>
+                            <th class="label">발행량</th>
+                            <td class="fiat-col">정부 정책에 따라 변동</td>
+                            <td class="abc-col">고정 (1억 T)</td>
+                        </tr>
+                        <tr>
+                            <th class="label">인플레이션</th>
+                            <td class="fiat-col">발생 가능</td>
+                            <td class="abc-col">자산 가치 연동</td>
+                        </tr>
+                        <tr>
+                            <th class="label">투명성</th>
+                            <td class="fiat-col">중앙은행 정책 의존</td>
+                            <td class="abc-col">OpenHash 기반 공개</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box">
+                    <div class="info-box-title">핵심 차이점</div>
+                    <div class="info-box-content">
+                        원화(KRW)의 가치는 <strong>대한민국 정부의 조세권</strong>이 보장합니다. 
+                        반면 EGCT의 가치는 <strong>ACI와 그 자회사들의 실물 자산</strong>이 보장합니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 섹션 2: 가치 보장 구조 -->
+        <div class="content-section">
+            <div class="section-header">
+                <span class="section-num">2</span>
+                <h2 class="section-title">EGCT 가치 보장 구조</h2>
+            </div>
+            <div class="section-body">
+                <div class="structure-diagram">
+                    <div class="structure-node" style="background:#fff; color:#1a56db; border-color:#1a56db;">
+                        <div class="node-label">EGCT</div>
+                        <div class="node-desc" style="color:#333;">발행량 1억 T · 1T = ₩1,000</div>
+                    </div>
+                    
+                    <div class="structure-arrow"><i class="fas fa-arrow-up"></i></div>
+                    <div class="arrow-label">가치 보장</div>
+                    
+                    <!-- 가운데 행: OpenHash → ACI ← A.I -->
+                    <div class="structure-row" style="display:flex; align-items:center; justify-content:center; gap:16px;">
+                        <div class="structure-node-side" style="background:#6b7280; color:#fff; border:2px solid #4b5563; border-radius:8px; padding:16px 24px; text-align:center; min-width:120px;">
+                            <div class="node-label" style="font-size:16px; font-weight:700;">OpenHash</div>
+                        </div>
+                        <div class="structure-arrow" style="color:#1a56db; font-size:20px;"><i class="fas fa-arrow-right"></i></div>
+                        <div class="structure-node primary">
+                            <div class="node-label">ACI (AI City Inc.)</div>
+                            <div class="node-desc">발행주식 1억 주 = EGCT 1억 T 담보</div>
+                        </div>
+                        <div class="structure-arrow" style="color:#1a56db; font-size:20px;"><i class="fas fa-arrow-left"></i></div>
+                        <div class="structure-node-side" style="background:#6b7280; color:#fff; border:2px solid #4b5563; border-radius:8px; padding:16px 24px; text-align:center; min-width:120px;">
+                            <div class="node-label" style="font-size:16px; font-weight:700;">A.I</div>
+                        </div>
+                    </div>
+                    
+                    <div class="structure-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="arrow-label">지분 50% 보유</div>
+                    
+                    <div class="structure-node" style="background:#fff; color:#34a853; border-color:#34a853;">
+                        <div class="node-label">ACI 자회사 (200+)</div>
+                        <div class="node-desc" style="color:#333;">공공 부문 + 시장 부문 = 실물 가치 창출</div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-box-title">프랙탈 구조</div>
+                    <div class="info-box-content">
+                        ACI는 200여 개 자회사 각각의 지분 <strong>50%</strong>를 보유합니다. 
+                        각 자회사 주식의 거래 결제 수단은 오직 <strong>EGCT</strong>입니다.
+                        자회사 가치 → ACI 가치 → EGCT 가치로 연결되는 구조입니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 섹션 3: ACI 자회사 -->
+        <div class="content-section">
+            <div class="section-header">
+                <span class="section-num">3</span>
+                <h2 class="section-title">ACI 자회사 현황</h2>
+            </div>
+            <div class="section-body">
+                <div class="subsidiary-grid">
+                    <div class="subsidiary-category">
+                        <div class="category-title">공공 부문</div>
+                        <ul class="category-list">
+                            <li>ACI 사법 - AI 민사 재판 서비스</li>
+                            <li>ACI 입법 - AI 국회 서비스</li>
+                            <li>ACI 국세청 - AI 세무 대행</li>
+                            <li>ACI 특허청 - AI 특허 출원</li>
+                            <li>ACI 경찰청 - AI 민원 서비스</li>
+                            <li>ACI 보건복지부 - AI 복지 상담</li>
+                        </ul>
+                    </div>
+                    <div class="subsidiary-category">
+                        <div class="category-title">시장 부문</div>
+                        <ul class="category-list">
+                            <li>ACI 의료 - AI 의료 서비스</li>
+                            <li>ACI 교육 - AI 맞춤형 교육</li>
+                            <li>ACI 교통 - AI 교통 시스템</li>
+                            <li>ACI 은행 - AI 금융 서비스</li>
+                            <li>ACI 제조 - AI 스마트 팩토리</li>
+                            <li>ACI 에너지 - AI 신재생 에너지</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="info-box example">
+                    <div class="info-box-title">예시: ACI 사법</div>
+                    <div class="info-box-content">
+                        ACI 사법은 1심·2심 법원을 <strong>AI 판사</strong>로 대체한 민사 재판 서비스를 제공합니다.
+                        원고와 피고가 합의하면, 법원 방문 없이 신속하고 저렴하게 분쟁을 해결할 수 있습니다.
+                        <br><small style="color:#888;">※ 법적 구속력은 없으나, 당사자 합의에 의한 조정 효력</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 섹션 4: EGCT 전용 거래 -->
+        <div class="content-section">
+            <div class="section-header">
+                <span class="section-num">4</span>
+                <h2 class="section-title">EGCT 전용 거래의 목적</h2>
+            </div>
+            <div class="section-body">
+                <p style="font-size:14px; color:#333; margin-bottom:20px;">
+                    ACI 자회사의 주식과 채권은 오직 <strong>EGCT로만</strong> 거래할 수 있습니다. 
+                    이 설계의 목적은 <strong>공적 이익과 사적 이익의 균형</strong>입니다.
+                </p>
+                
+                <div class="flow-chart">
+                    <div class="flow-step">
+                        <div class="flow-step-num">STEP 1</div>
+                        <div class="flow-step-text">ACI 의료<br>수익 발생</div>
+                    </div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">STEP 2</div>
+                        <div class="flow-step-text">주가 상승<br>투자 수요↑</div>
+                    </div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="flow-step highlight">
+                        <div class="flow-step-num">STEP 3</div>
+                        <div class="flow-step-text">EGCT<br>수요 증가</div>
+                    </div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="flow-step highlight">
+                        <div class="flow-step-num">STEP 4</div>
+                        <div class="flow-step-text">EGCT<br>가치 상승</div>
+                    </div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">STEP 5</div>
+                        <div class="flow-step-text">공공의료<br>운영 지원</div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-box-title">공익 순환 구조</div>
+                    <div class="info-box-content">
+                        수익성 높은 <strong>ACI 의료</strong>의 주가가 오르면, 투자자들은 주식을 사기 위해 먼저 EGCT를 구매해야 합니다.
+                        이는 EGCT 가치 상승으로 이어지며, 결과적으로 수익률이 0인 <strong>ACI 공공 의료</strong>(장애인·노약자 지원)도
+                        ACI가 보유한 50% 지분을 통해 운영비를 충당할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 섹션 5: 지분 분배 -->
+        <div class="content-section">
+            <div class="section-header">
+                <span class="section-num">5</span>
+                <h2 class="section-title">ACI 지분 분배</h2>
+            </div>
+            <div class="section-body">
+                <div class="distribution-row">
+                    <div class="chart-wrapper">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                    <div>
+                        <table class="distribution-table">
+                            <thead>
+                                <tr>
+                                    <th>구분</th>
+                                    <th>대상</th>
+                                    <th>비율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="color-box gov"></span>공적 기부</td>
+                                    <td>한국 정부 무상 기부</td>
+                                    <td>90%</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="color-box dev"></span>개발자 보상</td>
+                                    <td>시스템 설계·개발 기여자</td>
+                                    <td>10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="info-box" style="margin-top:16px;">
+                            <div class="info-box-content">
+                                ACI 지분 90%를 정부에 무상 기부함으로써, 각 자회사 지분의 <strong>45%</strong>(50% × 90%)가
+                                공적 이익 영역에 포함됩니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 요약 -->
+        <div class="content-section">
+            <div class="summary-section">
+                <h3 class="summary-title">EGCT: 자산이 보장하는 새로운 화폐</h3>
+                <p class="summary-text">
+                    EGCT는 정부가 아닌 실물 자산이 가치를 보장하는 자산담보디지털화폐입니다.<br>
+                    ACI와 200여 개 자회사들의 기업 가치가 EGCT의 가치를 뒷받침하며,<br>
+                    수익성 있는 사업의 성장이 공익 사업의 지속을 가능하게 하는<br>
+                    <strong>공적 이익과 사적 이익의 선순환 구조</strong>를 실현합니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const ctx = document.getElementById('distributionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['정부 기부 (90%)', '개발자 (10%)'],
+            datasets: [{
+                data: [90, 10],
+                backgroundColor: ['#1a56db', '#34a853'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            cutout: '60%'
+        }
+    });
+    </script>
+</body>
+</html>

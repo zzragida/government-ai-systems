@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 통합대학 | OpenHash University</title>
+    
+    <!-- React & Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Recharts -->
+    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.5.0/umd/Recharts.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0046FF 0%, #1E40AF 50%, #0066CC 100%);
+        }
+        
+        .gradient-gold {
+            background: linear-gradient(135deg, #0046FF 0%, #1E40AF 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 70, 255, 0.2);
+        }
+        
+        .sidebar {
+            width: 280px;
+            min-height: calc(100vh - 64px);
+            transition: all 0.3s ease;
+            background-color: white;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        @keyframes pulse-gov24 {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 70, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 70, 255, 0.6); }
+        }
+        
+        .pulse-gov24 {
+            animation: pulse-gov24 2s ease-in-out infinite;
+        }
+        
+        .section-white { background-color: white; }
+        .section-gray { background-color: #f8f9fa; }
+        
+        .bg-gov24-light { background-color: #E8F0FF; }
+        .text-gov24-primary { color: #0046FF; }
+        .border-gov24 { border-color: #0046FF; }
+    </style>
+    <link rel="stylesheet" href="/common/floating-chat.css">
+    <script src="/common/floating-chat.js"></script>
+</head>
+<body>
+
+    <!-- 데모 배너 -->
+        <div style="background:#4B5563;color:white;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+        <p style="font-size:14px;font-weight:600;margin:0;">⚠️ 본 사이트는 OpenHash 기술의 실증을 위한 데모 시스템입니다 (실제 정부 서비스 아님)</p>
+        <div style="display:flex;gap:20px;">
+            <a href="http://100.30.14.224/openhash-system/" style="color:white;text-decoration:none;font-size:14px;font-weight:600;display:flex;align-items:center;gap:4px;">
+                <span>Openhash</span>
+                <i class="fas fa-question-circle" style="font-size:16px;"></i>
+            </a>
+            <a href="http://100.30.14.224/national-data-registry/" style="color:white;text-decoration:underline;font-size:14px;font-weight:600;">국가 데이터처</a>
+        </div>
+    </div>
+    <div id="root"></div>
+    
+    <script type="text/babel" src="js/components/Header.js?v=8"></script>
+    <script type="text/babel" src="js/components/Navigation.js?v=8"></script>
+    <script type="text/babel" src="js/components/Dashboard.js?v=8"></script>
+    <script type="text/babel" src="js/components/MyLearning.js?v=8"></script>
+    <script type="text/babel" src="js/components/CourseList.js?v=8"></script>
+    <script type="text/babel" src="js/components/AIProfessor.js?v=8"></script>
+    <script type="text/babel" src="js/components/ExamCenter.js?v=8"></script>
+    <script type="text/babel" src="js/components/GradeReport.js?v=8"></script>
+    <script type="text/babel" src="js/components/CareerRecommend.js?v=8"></script>
+    <script type="text/babel" src="js/components/ThesisAssistant.js?v=8"></script>
+    <script type="text/babel" src="js/components/CommunityHub.js?v=8"></script>
+    <script type="text/babel" src="js/components/PrivateVault.js?v=8"></script>
+    <script type="text/babel" src="js/components/AIChat.js?v=8"></script>
+    <script type="text/babel" src="js/components/FloatingHelp.js?v=8"></script>
+    <script type="text/babel" src="js/components/OnboardingTour.js?v=8"></script>
+    <script type="text/babel" src="js/app.js?v=8"></script>
+</body>
+</html>

@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACI 자산 거래소</title>
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 거래소 전용 스타일 */
+        .exchange-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            gap: 12px;
+            padding: 16px;
+            height: calc(100vh - 140px);
+            background: #0d1117;
+        }
+        
+        /* 좌측 패널 - 종목 리스트 */
+        .stock-list-panel {
+            background: #161b22;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+            color: #e6edf3;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-box {
+            padding: 8px 12px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #e6edf3;
+            font-size: 13px;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 8px 12px;
+            gap: 4px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .category-tab {
+            padding: 5px 8px;
+            font-size: 10px;
+            background: transparent;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #8b949e;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .category-tab:hover, .category-tab.active {
+            background: #21262d;
+            color: #58a6ff;
+            border-color: #58a6ff;
+        }
+        
+        .stock-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .stock-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+            transition: background 0.2s;
+            align-items: center;
+        }
+        
+        .stock-item:hover {
+            background: #21262d;
+        }
+        
+        .stock-item.selected {
+            background: #1f3a5f;
+            border-left: 3px solid #58a6ff;
+        }
+        
+        .stock-name {
+            font-size: 12px;
+            color: #e6edf3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .stock-code {
+            font-size: 9px;
+            color: #8b949e;
+            margin-top: 2px;
+        }
+        
+        .stock-price {
+            font-size: 12px;
+            font-weight: 600;
+            color: #e6edf3;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stock-change {
+            font-size: 11px;
+            text-align: right;
+            min-width: 55px;
+        }
+        
+        .stock-change.up { color: #f85149; }
+        .stock-change.down { color: #3fb950; }
+        .stock-change.flat { color: #8b949e; }
+        
+        /* 중앙 패널 - 차트 및 호가 */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* 종목 정보 헤더 */
+        .stock-header {
+            background: #161b22;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .stock-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e6edf3;
+        }
+        
+        .stock-subtitle {
+            font-size: 12px;
+            color: #8b949e;
+        }
+        
+        .current-price-box {
+            text-align: right;
+        }
+        
+        .current-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f85149;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .current-price.down {
+            color: #3fb950;
+        }
+        
+        .price-change {
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .price-change.up { color: #f85149; }
+        .price-change.down { color: #3fb950; }
+        
+        .price-info {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+        
+        /* 차트 영역 */
+        .chart-panel {
+            background: #161b22;
+            border-radius: 8px;
+            flex: 1;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-toolbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .chart-type-tabs {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .chart-type-tab {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: transparent;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #8b949e;
+            cursor: pointer;
+        }
+        
+        .chart-type-tab.active {
+            background: #58a6ff;
+            color: #fff;
+            border-color: #58a6ff;
+        }
+        
+        .time-tabs {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .time-tab {
+            padding: 6px 10px;
+            font-size: 11px;
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .time-tab.active {
+            background: #21262d;
+            color: #e6edf3;
+        }
+        
+        .chart-area {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b949e;
+        }
+        
+        /* 호가창 */
+        .orderbook-panel {
+            background: #161b22;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .orderbook-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 8px 12px;
+            border-bottom: 1px solid #30363d;
+            font-size: 11px;
+            color: #8b949e;
+            text-align: center;
+        }
+        
+        .orderbook-body {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .orderbook-asks, .orderbook-bids {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .orderbook-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 4px 12px;
+            font-size: 12px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .orderbook-row .qty {
+            color: #8b949e;
+        }
+        
+        .orderbook-row .price {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .orderbook-asks .price { color: #3fb950; }
+        .orderbook-bids .price { color: #f85149; }
+        
+        .orderbook-row .bar {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            opacity: 0.15;
+        }
+        
+        .orderbook-asks .bar {
+            right: 0;
+            background: #3fb950;
+        }
+        
+        .orderbook-bids .bar {
+            left: 0;
+            background: #f85149;
+        }
+        
+        .orderbook-spread {
+            padding: 8px 12px;
+            text-align: center;
+            background: #0d1117;
+            font-size: 11px;
+            color: #8b949e;
+            border-top: 1px solid #30363d;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        /* 우측 패널 - 주문 */
+        .order-panel {
+            background: #161b22;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .order-tabs {
+            display: flex;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .order-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #8b949e;
+            transition: all 0.2s;
+        }
+        
+        .order-tab.buy.active {
+            color: #f85149;
+            border-bottom: 2px solid #f85149;
+            background: rgba(248, 81, 73, 0.1);
+        }
+        
+        .order-tab.sell.active {
+            color: #3fb950;
+            border-bottom: 2px solid #3fb950;
+            background: rgba(63, 185, 80, 0.1);
+        }
+        
+        .order-type-tabs {
+            display: flex;
+            padding: 12px;
+            gap: 8px;
+        }
+        
+        .order-type-tab {
+            flex: 1;
+            padding: 8px;
+            font-size: 12px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            cursor: pointer;
+        }
+        
+        .order-type-tab.active {
+            background: #0d1117;
+            color: #e6edf3;
+            border-color: #58a6ff;
+        }
+        
+        .order-form {
+            padding: 12px;
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 6px;
+        }
+        
+        .form-input-group {
+            display: flex;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .form-input-group input {
+            flex: 1;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            color: #e6edf3;
+            font-size: 14px;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-input-group input:focus {
+            outline: none;
+        }
+        
+        .form-input-group .unit {
+            padding: 10px 12px;
+            color: #8b949e;
+            font-size: 12px;
+            background: #21262d;
+        }
+        
+        .qty-buttons {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        
+        .qty-btn {
+            flex: 1;
+            padding: 6px;
+            font-size: 11px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #8b949e;
+            cursor: pointer;
+        }
+        
+        .qty-btn:hover {
+            background: #30363d;
+            color: #e6edf3;
+        }
+        
+        .order-summary {
+            padding: 12px;
+            background: #0d1117;
+            border-radius: 6px;
+            margin: 12px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 8px;
+            border-top: 1px solid #30363d;
+            font-weight: 600;
+        }
+        
+        .summary-label { color: #8b949e; }
+        .summary-value { color: #e6edf3; }
+        
+        .order-btn {
+            margin: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .order-btn.buy {
+            background: linear-gradient(135deg, #f85149, #da3633);
+            color: white;
+        }
+        
+        .order-btn.sell {
+            background: linear-gradient(135deg, #3fb950, #238636);
+            color: white;
+        }
+        
+        .order-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        /* 하단 패널 - 보유/주문내역 */
+        .bottom-panel {
+            background: #161b22;
+            border-radius: 8px;
+            margin: 0 16px 16px;
+        }
+        
+        .bottom-tabs {
+            display: flex;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .bottom-tab {
+            padding: 12px 20px;
+            font-size: 13px;
+            color: #8b949e;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+        
+        .bottom-tab.active {
+            color: #e6edf3;
+            border-bottom: 2px solid #58a6ff;
+        }
+        
+        .bottom-content {
+            padding: 16px;
+            min-height: 120px;
+            overflow-x: auto;
+        }
+        
+        .holdings-table {
+            width: 100%;
+            font-size: 12px;
+            min-width: 800px;
+        }
+        
+        .holdings-table th {
+            text-align: left;
+            padding: 8px 12px;
+            color: #8b949e;
+            font-weight: 500;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .holdings-table td {
+            padding: 10px 12px;
+            color: #e6edf3;
+            border-bottom: 1px solid #21262d;
+        }
+        
+        .holdings-table .profit.up { color: #f85149; }
+        .holdings-table .profit.down { color: #3fb950; }
+        
+        /* 반응형 */
+        @media (max-width: 1200px) {
+            .exchange-container {
+                grid-template-columns: 260px 1fr 280px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .exchange-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .stock-list-panel {
+                max-height: 300px;
+            }
+        }
+        
+        /* 자산 유형 뱃지 */
+        .asset-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .asset-badge.stock {
+            background: #1f3a5f;
+            color: #58a6ff;
+        }
+        
+        .asset-badge.bond {
+            background: #3d2f1f;
+            color: #d29922;
+        }
+        
+        /* 종목 수 표시 */
+        .stock-count {
+            font-size: 11px;
+            color: #8b949e;
+            padding: 4px 12px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        /* 기준가 안내 */
+        .base-price-info {
+            font-size: 10px;
+            color: #8b949e;
+            padding: 6px 12px;
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="top-header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>EGCT 거래소</h1>
+            <div class="header-buttons" style="display:flex; gap:12px;">
+                <a href="http://100.30.14.224/portal/" class="header-btn" style="background:rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:14px; display:flex; align-items:center; gap:6px; transition:background 0.2s;"><i class="fas fa-question-circle"></i> 포털</a>
+                <a href="http://100.30.14.224/openhash-system/" class="header-btn" style="background:rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:14px; display:flex; align-items:center; gap:6px; transition:background 0.2s;"><i class="fas fa-question-circle"></i> OpenHash</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <div class="tab-nav-inner">
+            <a href="trading.html" class="tab"><i class="fas fa-exchange-alt"></i>EGCT 거래</a>
+            <a href="hashchain-demo.html" class="tab"><i class="fas fa-link"></i>오픈해시</a>
+            <a href="abdc.html" class="tab"><i class="fas fa-gem"></i>ABDC 화폐</a>
+            <a href="pool.html" class="tab"><i class="fas fa-cubes"></i>자산 POOL</a>
+            <a href="exchange.html" class="tab active"><i class="fas fa-chart-line"></i>자산 거래소</a>
+            <a href="holders.html" class="tab"><i class="fas fa-users"></i>보유자 현황</a>
+            <a href="prices.html" class="tab"><i class="fas fa-chart-bar"></i>시세</a>
+            <a href="mypage.html" class="tab"><i class="fas fa-user"></i>My Page</a>
+            <a href="pdv.html" class="tab"><i class="fas fa-file-invoice"></i>My PDV</a>
+        </div>
+    </div>
+
+    <!-- 메인 거래소 레이아웃 -->
+    <div class="exchange-container">
+        <!-- 좌측: 종목 리스트 -->
+        <div class="stock-list-panel">
+            <div class="panel-header">
+                <i class="fas fa-list"></i> ACI 자회사
+            </div>
+            <div class="search-box">
+                <input type="text" id="stockSearch" placeholder="종목명 검색...">
+            </div>
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">전체</button>
+                <button class="category-tab" data-category="core">핵심기술</button>
+                <button class="category-tab" data-category="gov">행정부</button>
+                <button class="category-tab" data-category="jud">사법부</button>
+                <button class="category-tab" data-category="leg">입법부</button>
+                <button class="category-tab" data-category="ind">헌법기관</button>
+                <button class="category-tab" data-category="loc">자치단체</button>
+                <button class="category-tab" data-category="fin">금융</button>
+                <button class="category-tab" data-category="edu">교육</button>
+                <button class="category-tab" data-category="med">의료</button>
+                <button class="category-tab" data-category="bond">채권</button>
+            </div>
+            <div class="base-price-info">📌 기준가 1T, 등락률 반영 (1T = ₩1,000 KRW)</div>
+            <div class="stock-count" id="stockCount">총 0개 종목</div>
+            <div class="stock-list" id="stockList">
+                <!-- 종목 리스트 동적 생성 -->
+            </div>
+        </div>
+
+        <!-- 중앙: 차트 및 호가 -->
+        <div class="main-panel">
+            <!-- 종목 정보 -->
+            <div class="stock-header">
+                <div class="stock-info">
+                    <div>
+                        <div class="stock-title" id="selectedStockName">ACI 기획재정부</div>
+                        <div class="stock-subtitle" id="selectedStockCode">ACI-MOF · 주식 · 기준가 1T</div>
+                    </div>
+                </div>
+                <div class="current-price-box">
+                    <div class="current-price" id="currentPrice">1.0125</div>
+                    <div class="price-change up" id="priceChange">+0.0125 T (+1.25%)</div>
+                    <div class="price-info">1 T = ₩1,000 KRW</div>
+                </div>
+            </div>
+
+            <!-- 차트 + 호가 -->
+            <div style="display: flex; gap: 12px; flex: 1;">
+                <!-- 차트 -->
+                <div class="chart-panel" style="flex: 1;">
+                    <div class="chart-toolbar">
+                        <div class="chart-type-tabs">
+                            <button class="chart-type-tab active">캔들</button>
+                            <button class="chart-type-tab">라인</button>
+                            <button class="chart-type-tab">영역</button>
+                        </div>
+                        <div class="time-tabs">
+                            <button class="time-tab">1분</button>
+                            <button class="time-tab">5분</button>
+                            <button class="time-tab">15분</button>
+                            <button class="time-tab active">1시간</button>
+                            <button class="time-tab">1일</button>
+                            <button class="time-tab">1주</button>
+                            <button class="time-tab">1월</button>
+                        </div>
+                    </div>
+                    <div class="chart-area">
+                        <div style="text-align: center;">
+                            <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                            <p>차트 데이터 로딩 중...</p>
+                            <p style="font-size: 12px; margin-top: 8px;">OpenHash 기반 실시간 시세</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 호가창 -->
+                <div class="orderbook-panel" style="width: 220px;">
+                    <div class="panel-header">
+                        <i class="fas fa-table"></i> 호가
+                    </div>
+                    <div class="orderbook-header">
+                        <span>잔량</span>
+                        <span>가격 (T)</span>
+                        <span>잔량</span>
+                    </div>
+                    <div class="orderbook-body">
+                        <div class="orderbook-asks" id="orderbookAsks"></div>
+                        <div class="orderbook-spread">
+                            스프레드: <span id="spreadValue">0.001 T</span>
+                        </div>
+                        <div class="orderbook-bids" id="orderbookBids"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 우측: 주문 패널 -->
+        <div class="order-panel">
+            <div class="order-tabs">
+                <button class="order-tab buy active" data-type="buy">매수</button>
+                <button class="order-tab sell" data-type="sell">매도</button>
+            </div>
+            <div class="order-type-tabs">
+                <button class="order-type-tab active">지정가</button>
+                <button class="order-type-tab">시장가</button>
+                <button class="order-type-tab">예약</button>
+            </div>
+            <div class="order-form">
+                <div class="form-group">
+                    <label class="form-label">주문 가격 (1T = ₩1,000)</label>
+                    <div class="form-input-group">
+                        <input type="text" id="orderPrice" value="1.0000">
+                        <span class="unit">T</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">주문 수량</label>
+                    <div class="form-input-group">
+                        <input type="text" id="orderQty" value="0">
+                        <span class="unit">주</span>
+                    </div>
+                    <div class="qty-buttons">
+                        <button class="qty-btn" data-pct="10">10%</button>
+                        <button class="qty-btn" data-pct="25">25%</button>
+                        <button class="qty-btn" data-pct="50">50%</button>
+                        <button class="qty-btn" data-pct="100">100%</button>
+                    </div>
+                </div>
+            </div>
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span class="summary-label">주문 가능</span>
+                    <span class="summary-value" id="availableBalance">50,000 T</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">수수료 (0%)</span>
+                    <span class="summary-value">0 T</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">총 주문금액</span>
+                    <span class="summary-value" id="totalOrderAmount">0 T</span>
+                </div>
+            </div>
+            <button class="order-btn buy" id="orderBtn">매수</button>
+        </div>
+    </div>
+
+    <!-- 하단: 보유/주문 내역 -->
+    <div class="bottom-panel">
+        <div class="bottom-tabs">
+            <button class="bottom-tab active">보유 자산</button>
+            <button class="bottom-tab">미체결</button>
+            <button class="bottom-tab">체결 내역</button>
+            <button class="bottom-tab">주문 내역</button>
+        </div>
+        <div class="bottom-content">
+            <table class="holdings-table">
+                <thead>
+                    <tr>
+                        <th>종목명</th>
+                        <th>보유수량</th>
+                        <th>매입가 (T)</th>
+                        <th>현재가 (T)</th>
+                        <th>평가손익</th>
+                        <th>수익률</th>
+                        <th>평가금액 (T)</th>
+                    </tr>
+                </thead>
+                <tbody id="holdingsBody">
+                    <tr>
+                        <td>ACI 기획재정부 <span class="asset-badge stock">주식</span></td>
+                        <td>1,000</td>
+                        <td>1.0000</td>
+                        <td>1.0125</td>
+                        <td class="profit up">+12.50</td>
+                        <td class="profit up">+1.25%</td>
+                        <td>1,012.50</td>
+                    </tr>
+                    <tr>
+                        <td>ACI 대법원 <span class="asset-badge stock">주식</span></td>
+                        <td>500</td>
+                        <td>1.0000</td>
+                        <td>0.9935</td>
+                        <td class="profit down">-3.25</td>
+                        <td class="profit down">-0.65%</td>
+                        <td>496.75</td>
+                    </tr>
+                    <tr>
+                        <td>ACI 국채 2030 <span class="asset-badge bond">채권</span></td>
+                        <td>200</td>
+                        <td>1.0000</td>
+                        <td>1.0018</td>
+                        <td class="profit up">+0.36</td>
+                        <td class="profit up">+0.18%</td>
+                        <td>200.36</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+    // =========================================
+    // 전체 ACI 자회사 데이터 (자산 POOL 기준)
+    // 기준가: 1T (1T = KRW 1,000)
+    // 현재가 = 1 + (등락률 / 100)
+    // =========================================
+    const stocks = [
+        // ===== 핵심 기술 (core) =====
+        { code: 'OPENHASH', name: 'ACI OpenHash', cat: 'core', type: 'stock', change: 3.25 },
+        { code: 'PDV', name: 'ACI 프라이빗 데이터 금고', cat: 'core', type: 'stock', change: 2.15 },
+        { code: 'NDR', name: 'ACI 국가 데이터 레지스트리', cat: 'core', type: 'stock', change: 1.85 },
+        { code: 'NFS', name: 'ACI 국가 재무제표', cat: 'core', type: 'stock', change: 0.95 },
+        { code: 'COLOR', name: 'ACI 색상 코드', cat: 'core', type: 'stock', change: -0.45 },
+        { code: 'LLM', name: 'ACI LLM', cat: 'core', type: 'stock', change: 4.12 },
+        { code: 'ROBOT', name: 'ACI 로보틱스', cat: 'core', type: 'stock', change: 2.88 },
+        { code: 'SAT', name: 'ACI 위성', cat: 'core', type: 'stock', change: 1.65 },
+        { code: 'TELECOM', name: 'ACI 통신', cat: 'core', type: 'stock', change: 0.78 },
+        { code: 'FPGA', name: 'ACI FPGA 시장', cat: 'core', type: 'stock', change: 1.22 },
+        { code: 'PATAI', name: 'ACI 특허 AI', cat: 'core', type: 'stock', change: 2.35 },
+        { code: 'MFG', name: 'ACI 제조', cat: 'core', type: 'stock', change: 0.55 },
+        
+        // ===== 금융 (fin) =====
+        { code: 'DCURR', name: 'ACI 디지털 화폐', cat: 'fin', type: 'stock', change: 2.45 },
+        { code: 'BANK', name: 'ACI 은행', cat: 'fin', type: 'stock', change: 1.12 },
+        { code: 'INSUR', name: 'ACI 보험', cat: 'fin', type: 'stock', change: 0.85 },
+        { code: 'SEC', name: 'ACI 증권', cat: 'fin', type: 'stock', change: 1.95 },
+        { code: 'SEXCH', name: 'ACI 증권거래소', cat: 'fin', type: 'stock', change: 2.25 },
+        { code: 'FINSUP', name: 'ACI 금융감독', cat: 'fin', type: 'stock', change: 0.45 },
+        
+        // ===== 교육 (edu) =====
+        { code: 'AIEDU', name: 'ACI AI 맞춤형 교육', cat: 'edu', type: 'stock', change: 3.85 },
+        { code: 'KINDER', name: 'ACI 유치원 교육', cat: 'edu', type: 'stock', change: 0.65 },
+        { code: 'K12', name: 'ACI K-12 교육', cat: 'edu', type: 'stock', change: 1.25 },
+        { code: 'UNIV', name: 'ACI 대학', cat: 'edu', type: 'stock', change: 0.95 },
+        
+        // ===== 의료/제약 (med) =====
+        { code: 'MEDIC', name: 'ACI 의료', cat: 'med', type: 'stock', change: 2.15 },
+        { code: 'PHARMA', name: 'ACI 제약', cat: 'med', type: 'stock', change: 1.85 },
+        { code: 'MEDDEV', name: 'ACI 의료 기기', cat: 'med', type: 'stock', change: 2.45 },
+        { code: 'MEDSUP', name: 'ACI 의료 소모품', cat: 'med', type: 'stock', change: 0.75 },
+        { code: 'JEJUHOS', name: 'ACI 제주 병원', cat: 'med', type: 'stock', change: 1.55 },
+        
+        // ===== 공공 서비스 =====
+        { code: 'LEGIS', name: 'ACI 입법', cat: 'core', type: 'stock', change: 0.35 },
+        { code: 'JUDIC', name: 'ACI 사법', cat: 'core', type: 'stock', change: 0.55 },
+        { code: 'ADMIN', name: 'ACI 행정', cat: 'core', type: 'stock', change: 0.25 },
+        { code: 'INDEP', name: 'ACI 독립 헌법기관', cat: 'core', type: 'stock', change: 0.45 },
+        { code: 'LOCAL', name: 'ACI 자치단체', cat: 'core', type: 'stock', change: 0.65 },
+        
+        // ===== 전문 서비스 =====
+        { code: 'LAW', name: 'ACI 법률', cat: 'core', type: 'stock', change: 1.15 },
+        { code: 'TAX', name: 'ACI 세무', cat: 'core', type: 'stock', change: 0.85 },
+        { code: 'ACCT', name: 'ACI 회계', cat: 'core', type: 'stock', change: 0.75 },
+        { code: 'BIZ', name: 'ACI 비즈니스', cat: 'core', type: 'stock', change: 1.05 },
+        { code: 'IPR', name: 'ACI 지식재산권', cat: 'core', type: 'stock', change: 1.45 },
+        
+        // ===== 고용/생활 =====
+        { code: 'EMPLOY', name: 'ACI 완전고용', cat: 'core', type: 'stock', change: 0.95 },
+        { code: 'FOOD', name: 'ACI 식사', cat: 'core', type: 'stock', change: 0.35 },
+        { code: 'CLOTH', name: 'ACI 의류', cat: 'core', type: 'stock', change: 0.45 },
+        { code: 'GROCERY', name: 'ACI 식품', cat: 'core', type: 'stock', change: 0.55 },
+        { code: 'HOUSE', name: 'ACI 주택', cat: 'core', type: 'stock', change: 1.85 },
+        
+        // ===== 물류/교통 =====
+        { code: 'TRANS', name: 'ACI 교통', cat: 'core', type: 'stock', change: 0.75 },
+        { code: 'LOGIS', name: 'ACI 물류', cat: 'core', type: 'stock', change: 0.95 },
+        
+        // ===== 1차 산업 =====
+        { code: 'FARM', name: 'ACI 농산', cat: 'core', type: 'stock', change: 0.45 },
+        { code: 'FISH', name: 'ACI 수산', cat: 'core', type: 'stock', change: 0.55 },
+        { code: 'LIVE', name: 'ACI 축산', cat: 'core', type: 'stock', change: 0.35 },
+        
+        // ===== 건설/인프라 =====
+        { code: 'ROAD', name: 'ACI 도로', cat: 'core', type: 'stock', change: 0.65 },
+        { code: 'CIVIL', name: 'ACI 토목', cat: 'core', type: 'stock', change: 0.55 },
+        { code: 'CONST', name: 'ACI 건설', cat: 'core', type: 'stock', change: 0.85 },
+        
+        // ===== 에너지 =====
+        { code: 'WIND', name: 'ACI 풍력', cat: 'core', type: 'stock', change: 2.15 },
+        { code: 'SOLAR', name: 'ACI 태양광', cat: 'core', type: 'stock', change: 2.45 },
+        { code: 'TIDAL', name: 'ACI 조력', cat: 'core', type: 'stock', change: 1.25 },
+        
+        // ===== 레저/문화 =====
+        { code: 'SPORT', name: 'ACI 스포츠', cat: 'core', type: 'stock', change: 0.85 },
+        { code: 'LEISURE', name: 'ACI 레저', cat: 'core', type: 'stock', change: 0.75 },
+        { code: 'PARK', name: 'ACI 공원', cat: 'core', type: 'stock', change: 0.35 },
+        { code: 'HOSTEL', name: 'ACI 호스텔', cat: 'core', type: 'stock', change: 0.45 },
+        
+        // ===== 제주 특화 =====
+        { code: 'JEJUINT', name: 'ACI 제주 통합', cat: 'core', type: 'stock', change: 1.85 },
+        
+        // ===== 위생/환경 =====
+        { code: 'HYGIENE', name: 'ACI 위생', cat: 'core', type: 'stock', change: 0.25 },
+        { code: 'STORAGE', name: 'ACI 저장', cat: 'core', type: 'stock', change: 0.35 },
+        { code: 'FRANCH', name: 'ACI 프랜차이즈', cat: 'core', type: 'stock', change: 0.65 },
+        
+        // ===== 행정부 (gov) - 대통령 직속 =====
+        { code: 'PMO', name: 'ACI 대통령비서실', cat: 'gov', type: 'stock', change: 0.85 },
+        { code: 'NSO', name: 'ACI 국가안보실', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'PSG', name: 'ACI 대통령경호처', cat: 'gov', type: 'stock', change: 0.45 },
+        
+        // ===== 행정부 - 독립기관 =====
+        { code: 'BAI', name: 'ACI 감사원', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'NIS', name: 'ACI 국가정보원', cat: 'gov', type: 'stock', change: 0.65 },
+        { code: 'KCC', name: 'ACI 방송미디어통신위원회', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'CIO', name: 'ACI 고위공직자범죄수사처', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'NHRCK', name: 'ACI 국가인권위원회', cat: 'gov', type: 'stock', change: 0.35 },
+        { code: 'NEC', name: 'ACI 국가교육위원회', cat: 'gov', type: 'stock', change: 0.45 },
+        
+        // ===== 행정부 - 국무총리 소속 =====
+        { code: 'PM', name: 'ACI 국무총리실', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'OPC', name: 'ACI 국무조정실', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'PMS', name: 'ACI 국무총리비서실', cat: 'gov', type: 'stock', change: 0.35 },
+        
+        // ===== 행정부 - 처/위원회 =====
+        { code: 'MPM', name: 'ACI 인사혁신처', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'MOLEG', name: 'ACI 법제처', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'MFDS', name: 'ACI 식품의약품안전처', cat: 'gov', type: 'stock', change: 0.85 },
+        { code: 'NDRG', name: 'ACI 국가데이터처', cat: 'gov', type: 'stock', change: 1.25 },
+        { code: 'FTC', name: 'ACI 공정거래위원회', cat: 'gov', type: 'stock', change: 0.65 },
+        { code: 'PIPC', name: 'ACI 개인정보보호위원회', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'NSSC', name: 'ACI 원자력안전위원회', cat: 'gov', type: 'stock', change: 0.45 },
+        
+        // ===== 행정부 - 19부 =====
+        { code: 'MOF', name: 'ACI 기획재정부', cat: 'gov', type: 'stock', change: 1.25 },
+        { code: 'MSIT', name: 'ACI 과학기술정보통신부', cat: 'gov', type: 'stock', change: 1.85 },
+        { code: 'MOE', name: 'ACI 교육부', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'MOFA', name: 'ACI 외교부', cat: 'gov', type: 'stock', change: 0.65 },
+        { code: 'MOU', name: 'ACI 통일부', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'MOJ', name: 'ACI 법무부', cat: 'gov', type: 'stock', change: 0.85 },
+        { code: 'MND', name: 'ACI 국방부', cat: 'gov', type: 'stock', change: 1.15 },
+        { code: 'MOIS', name: 'ACI 행정안전부', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'MPVA', name: 'ACI 국가보훈부', cat: 'gov', type: 'stock', change: 0.35 },
+        { code: 'MCST', name: 'ACI 문화체육관광부', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'MAFRA', name: 'ACI 농림축산식품부', cat: 'gov', type: 'stock', change: 0.65 },
+        { code: 'MOTIE', name: 'ACI 산업통상자원부', cat: 'gov', type: 'stock', change: 1.25 },
+        { code: 'MOHW', name: 'ACI 보건복지부', cat: 'gov', type: 'stock', change: 0.95 },
+        { code: 'ME', name: 'ACI 기후환경부', cat: 'gov', type: 'stock', change: 1.45 },
+        { code: 'MOEL', name: 'ACI 고용노동부', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'MOGEF', name: 'ACI 성평등가족부', cat: 'gov', type: 'stock', change: 0.35 },
+        { code: 'MOLIT', name: 'ACI 국토교통부', cat: 'gov', type: 'stock', change: 0.85 },
+        { code: 'MOF2', name: 'ACI 해양수산부', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'MSS', name: 'ACI 중소벤처기업부', cat: 'gov', type: 'stock', change: 0.95 },
+        
+        // ===== 행정부 - 청 =====
+        { code: 'NTS', name: 'ACI 국세청', cat: 'gov', type: 'stock', change: 0.85 },
+        { code: 'KCS', name: 'ACI 관세청', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'PPS', name: 'ACI 조달청', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'KASA', name: 'ACI 우주항공청', cat: 'gov', type: 'stock', change: 2.15 },
+        { code: 'OKA', name: 'ACI 재외동포청', cat: 'gov', type: 'stock', change: 0.35 },
+        { code: 'SPO', name: 'ACI 검찰청', cat: 'gov', type: 'stock', change: 0.65 },
+        { code: 'MMA', name: 'ACI 병무청', cat: 'gov', type: 'stock', change: 0.25 },
+        { code: 'DAPA', name: 'ACI 방위사업청', cat: 'gov', type: 'stock', change: 0.95 },
+        { code: 'KNPA', name: 'ACI 경찰청', cat: 'gov', type: 'stock', change: 0.75 },
+        { code: 'NFA', name: 'ACI 소방청', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'CHA', name: 'ACI 국가유산청', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'RDA', name: 'ACI 농촌진흥청', cat: 'gov', type: 'stock', change: 0.35 },
+        { code: 'KFS', name: 'ACI 산림청', cat: 'gov', type: 'stock', change: 0.55 },
+        { code: 'KOSTAT', name: 'ACI 통계청', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'KDCA', name: 'ACI 질병관리청', cat: 'gov', type: 'stock', change: 1.25 },
+        { code: 'KMA', name: 'ACI 기상청', cat: 'gov', type: 'stock', change: 0.65 },
+        { code: 'KIPO', name: 'ACI 특허청', cat: 'gov', type: 'stock', change: 0.85 },
+        { code: 'MACC', name: 'ACI 행정중심복합도시건설청', cat: 'gov', type: 'stock', change: 0.35 },
+        { code: 'SDA', name: 'ACI 새만금개발청', cat: 'gov', type: 'stock', change: 0.45 },
+        { code: 'KCG', name: 'ACI 해양경찰청', cat: 'gov', type: 'stock', change: 0.55 },
+        
+        // ===== 사법부 (jud) =====
+        { code: 'SC', name: 'ACI 대법원', cat: 'jud', type: 'stock', change: 0.65 },
+        { code: 'HC', name: 'ACI 고등법원', cat: 'jud', type: 'stock', change: 0.45 },
+        { code: 'DC', name: 'ACI 지방법원', cat: 'jud', type: 'stock', change: 0.35 },
+        { code: 'PC', name: 'ACI 특허법원', cat: 'jud', type: 'stock', change: 0.55 },
+        { code: 'FC', name: 'ACI 가정법원', cat: 'jud', type: 'stock', change: 0.25 },
+        { code: 'AC', name: 'ACI 행정법원', cat: 'jud', type: 'stock', change: 0.35 },
+        { code: 'CAO', name: 'ACI 법원행정처', cat: 'jud', type: 'stock', change: 0.45 },
+        { code: 'JRTI', name: 'ACI 사법연수원', cat: 'jud', type: 'stock', change: 0.25 },
+        { code: 'JPRI', name: 'ACI 사법정책연구원', cat: 'jud', type: 'stock', change: 0.35 },
+        { code: 'CSTI', name: 'ACI 법원공무원교육원', cat: 'jud', type: 'stock', change: 0.15 },
+        { code: 'CLIB', name: 'ACI 법원도서관', cat: 'jud', type: 'stock', change: 0.25 },
+        { code: 'SCOM', name: 'ACI 양형위원회', cat: 'jud', type: 'stock', change: 0.35 },
+        
+        // ===== 입법부 (leg) =====
+        { code: 'NA', name: 'ACI 국회', cat: 'leg', type: 'stock', change: 0.55 },
+        { code: 'NASC', name: 'ACI 국회운영위원회', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NALC', name: 'ACI 법제사법위원회', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NAPC', name: 'ACI 정무위원회', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NAFC', name: 'ACI 기획재정위원회', cat: 'leg', type: 'stock', change: 0.45 },
+        { code: 'NAEC', name: 'ACI 교육위원회', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NASTC', name: 'ACI 과학기술정보방송통신위원회', cat: 'leg', type: 'stock', change: 0.55 },
+        { code: 'NAFAC', name: 'ACI 외교통일위원회', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NADC', name: 'ACI 국방위원회', cat: 'leg', type: 'stock', change: 0.45 },
+        { code: 'NAIC', name: 'ACI 행정안전위원회', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NACC', name: 'ACI 문화체육관광위원회', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NAAGC', name: 'ACI 농림축산식품해양수산위원회', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NAINC', name: 'ACI 산업통상자원중소벤처기업위원회', cat: 'leg', type: 'stock', change: 0.45 },
+        { code: 'NAHWC', name: 'ACI 보건복지위원회', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NAELC', name: 'ACI 환경노동위원회', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NATC', name: 'ACI 국토교통위원회', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NAINTC', name: 'ACI 정보위원회', cat: 'leg', type: 'stock', change: 0.45 },
+        { code: 'NABC', name: 'ACI 예산결산특별위원회', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NAETHC', name: 'ACI 윤리특별위원회', cat: 'leg', type: 'stock', change: 0.15 },
+        { code: 'NAS', name: 'ACI 국회사무처', cat: 'leg', type: 'stock', change: 0.35 },
+        { code: 'NALIB', name: 'ACI 국회도서관', cat: 'leg', type: 'stock', change: 0.25 },
+        { code: 'NABO', name: 'ACI 국회예산정책처', cat: 'leg', type: 'stock', change: 0.45 },
+        { code: 'NARS', name: 'ACI 국회입법조사처', cat: 'leg', type: 'stock', change: 0.35 },
+        
+        // ===== 독립헌법기관 (ind) =====
+        { code: 'CC', name: 'ACI 헌법재판소', cat: 'ind', type: 'stock', change: 0.55 },
+        { code: 'NECM', name: 'ACI 중앙선거관리위원회', cat: 'ind', type: 'stock', change: 0.45 },
+        { code: 'BAI2', name: 'ACI 감사원', cat: 'ind', type: 'stock', change: 0.65 },
+        
+        // ===== 자치단체 (loc) - 특별시/광역시 =====
+        { code: 'SEOUL', name: 'ACI 서울특별시', cat: 'loc', type: 'stock', change: 1.85 },
+        { code: 'BUSAN', name: 'ACI 부산광역시', cat: 'loc', type: 'stock', change: 1.25 },
+        { code: 'INCHEON', name: 'ACI 인천광역시', cat: 'loc', type: 'stock', change: 1.15 },
+        { code: 'DAEGU', name: 'ACI 대구광역시', cat: 'loc', type: 'stock', change: 0.95 },
+        { code: 'DAEJEON', name: 'ACI 대전광역시', cat: 'loc', type: 'stock', change: 0.85 },
+        { code: 'GWANGJU', name: 'ACI 광주광역시', cat: 'loc', type: 'stock', change: 0.75 },
+        { code: 'ULSAN', name: 'ACI 울산광역시', cat: 'loc', type: 'stock', change: 0.95 },
+        { code: 'SEJONG', name: 'ACI 세종특별자치시', cat: 'loc', type: 'stock', change: 1.45 },
+        
+        // ===== 자치단체 - 도 =====
+        { code: 'GYEONGGI', name: 'ACI 경기도', cat: 'loc', type: 'stock', change: 1.55 },
+        { code: 'GANGWON', name: 'ACI 강원특별자치도', cat: 'loc', type: 'stock', change: 0.85 },
+        { code: 'CHUNGBUK', name: 'ACI 충청북도', cat: 'loc', type: 'stock', change: 0.65 },
+        { code: 'CHUNGNAM', name: 'ACI 충청남도', cat: 'loc', type: 'stock', change: 0.75 },
+        { code: 'JEONBUK', name: 'ACI 전북특별자치도', cat: 'loc', type: 'stock', change: 0.55 },
+        { code: 'JEONNAM', name: 'ACI 전라남도', cat: 'loc', type: 'stock', change: 0.65 },
+        { code: 'GYEONGBUK', name: 'ACI 경상북도', cat: 'loc', type: 'stock', change: 0.75 },
+        { code: 'GYEONGNAM', name: 'ACI 경상남도', cat: 'loc', type: 'stock', change: 0.85 },
+        { code: 'JEJU', name: 'ACI 제주특별자치도', cat: 'loc', type: 'stock', change: 2.15 },
+        
+        // ===== 자치단체 - 기초 =====
+        { code: 'SUWON', name: 'ACI 수원시', cat: 'loc', type: 'stock', change: 0.75 },
+        { code: 'GANGHWA', name: 'ACI 강화군', cat: 'loc', type: 'stock', change: 0.35 },
+        { code: 'GANGNAM', name: 'ACI 강남구', cat: 'loc', type: 'stock', change: 1.25 },
+        { code: 'JEJUSI', name: 'ACI 제주시', cat: 'loc', type: 'stock', change: 0.95 },
+        { code: 'SEOGWIPO', name: 'ACI 서귀포시', cat: 'loc', type: 'stock', change: 0.75 },
+        { code: 'AEWOL', name: 'ACI 애월읍', cat: 'loc', type: 'stock', change: 0.55 },
+        { code: 'HALLIM', name: 'ACI 한림면', cat: 'loc', type: 'stock', change: 0.35 },
+        { code: 'ILDO1', name: 'ACI 일도1동', cat: 'loc', type: 'stock', change: 0.25 },
+        
+        // ===== 채권 (bond) - 기준가 1T =====
+        { code: 'BOND-2025', name: 'ACI 국채 2025', cat: 'bond', type: 'bond', change: 0.05 },
+        { code: 'BOND-2027', name: 'ACI 국채 2027', cat: 'bond', type: 'bond', change: 0.12 },
+        { code: 'BOND-2030', name: 'ACI 국채 2030', cat: 'bond', type: 'bond', change: 0.18 },
+        { code: 'BOND-2035', name: 'ACI 국채 2035', cat: 'bond', type: 'bond', change: -0.15 },
+        { code: 'BOND-2040', name: 'ACI 국채 2040', cat: 'bond', type: 'bond', change: -0.22 },
+        { code: 'BOND-2050', name: 'ACI 국채 2050', cat: 'bond', type: 'bond', change: -0.35 },
+        { code: 'SEOUL-BOND', name: 'ACI 서울시채 2028', cat: 'bond', type: 'bond', change: 0.08 },
+        { code: 'BUSAN-BOND', name: 'ACI 부산시채 2030', cat: 'bond', type: 'bond', change: 0.05 },
+        { code: 'GYEONGGI-BOND', name: 'ACI 경기도채 2029', cat: 'bond', type: 'bond', change: 0.10 },
+        { code: 'JEJU-BOND', name: 'ACI 제주도채 2027', cat: 'bond', type: 'bond', change: 0.06 },
+    ];
+
+    // 기준가 1T 기반 현재가 계산
+    const BASE_PRICE = 1; // 1T
+    function getPrice(change) {
+        return BASE_PRICE * (1 + change / 100);
+    }
+    
+    // 가격 포맷팅 (소수점 4자리)
+    function formatPrice(price) {
+        return price.toFixed(3);
+    }
+
+    // 종목 리스트 렌더링
+    function renderStockList(filter = 'all', search = '') {
+        const list = document.getElementById('stockList');
+        const filtered = stocks.filter(s => {
+            const matchType = filter === 'all' || s.cat === filter || (filter === 'bond' && s.type === 'bond');
+            const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || 
+                               s.code.toLowerCase().includes(search.toLowerCase());
+            return matchType && matchSearch;
+        });
+
+        document.getElementById('stockCount').textContent = `총 ${filtered.length}개 종목`;
+
+        list.innerHTML = filtered.map((s, i) => {
+            const price = getPrice(s.change);
+            return `
+            <div class="stock-item ${i === 0 ? 'selected' : ''}" data-code="${s.code}">
+                <div>
+                    <div class="stock-name">${s.name}</div>
+                    <div class="stock-code">${s.code} <span class="asset-badge ${s.type}">${s.type === 'stock' ? '주식' : '채권'}</span></div>
+                </div>
+                <div class="stock-price">${formatPrice(price)}</div>
+                <div class="stock-change ${s.change > 0 ? 'up' : s.change < 0 ? 'down' : 'flat'}">
+                    ${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%
+                </div>
+            </div>
+        `}).join('');
+
+        // 클릭 이벤트
+        list.querySelectorAll('.stock-item').forEach(item => {
+            item.addEventListener('click', () => selectStock(item.dataset.code));
+        });
+
+        // 첫 번째 종목 선택
+        if (filtered.length > 0) {
+            selectStock(filtered[0].code);
+        }
+    }
+
+    // 종목 선택
+    function selectStock(code) {
+        const stock = stocks.find(s => s.code === code);
+        if (!stock) return;
+
+        const price = getPrice(stock.change);
+        const changeAmt = price - BASE_PRICE;
+
+        // 선택 상태 업데이트
+        document.querySelectorAll('.stock-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.code === code);
+        });
+
+        // 헤더 업데이트
+        document.getElementById('selectedStockName').textContent = stock.name;
+        document.getElementById('selectedStockCode').textContent = `${stock.code} · ${stock.type === 'stock' ? '주식' : '채권'} · 기준가 1T`;
+        
+        const priceEl = document.getElementById('currentPrice');
+        priceEl.textContent = formatPrice(price) + ' T';
+        priceEl.className = 'current-price ' + (stock.change < 0 ? 'down' : '');
+
+        const changeEl = document.getElementById('priceChange');
+        changeEl.textContent = `${changeAmt >= 0 ? '+' : ''}${changeAmt.toFixed(3)} T (${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%)`;
+        changeEl.className = 'price-change ' + (stock.change >= 0 ? 'up' : 'down');
+
+        // 주문 가격 업데이트
+        document.getElementById('orderPrice').value = formatPrice(price);
+
+        // 호가창 업데이트
+        renderOrderbook(price);
+    }
+
+    // 호가창 렌더링
+    function renderOrderbook(basePrice) {
+        const asksEl = document.getElementById('orderbookAsks');
+        const bidsEl = document.getElementById('orderbookBids');
+        const tick = 0.001; // 호가 단위 0.001T
+        
+        let asksHtml = '';
+        let bidsHtml = '';
+        
+        // 매도 호가
+        for (let i = 5; i >= 1; i--) {
+            const price = basePrice + (i * tick);
+            const qty = Math.floor(Math.random() * 5000) + 500;
+            const barWidth = Math.min(qty / 50, 100);
+            asksHtml += `
+                <div class="orderbook-row">
+                    <span class="bar" style="width: ${barWidth}%"></span>
+                    <span class="qty">${qty.toLocaleString()}</span>
+                    <span class="price">${formatPrice(price)}</span>
+                    <span class="qty"></span>
+                </div>
+            `;
+        }
+        
+        // 매수 호가
+        for (let i = 1; i <= 5; i++) {
+            const price = basePrice - (i * tick);
+            const qty = Math.floor(Math.random() * 5000) + 500;
+            const barWidth = Math.min(qty / 50, 100);
+            bidsHtml += `
+                <div class="orderbook-row">
+                    <span class="bar" style="width: ${barWidth}%"></span>
+                    <span class="qty"></span>
+                    <span class="price">${formatPrice(price)}</span>
+                    <span class="qty">${qty.toLocaleString()}</span>
+                </div>
+            `;
+        }
+        
+        asksEl.innerHTML = asksHtml;
+        bidsEl.innerHTML = bidsHtml;
+        document.getElementById('spreadValue').textContent = `${tick.toFixed(3)} T`;
+    }
+
+    // 카테고리 탭
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderStockList(tab.dataset.category, document.getElementById('stockSearch').value);
+        });
+    });
+
+    // 검색
+    document.getElementById('stockSearch').addEventListener('input', (e) => {
+        const activeCategory = document.querySelector('.category-tab.active').dataset.category;
+        renderStockList(activeCategory, e.target.value);
+    });
+
+    // 매수/매도 탭
+    document.querySelectorAll('.order-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const btn = document.getElementById('orderBtn');
+            if (tab.dataset.type === 'buy') {
+                btn.className = 'order-btn buy';
+                btn.textContent = '매수';
+            } else {
+                btn.className = 'order-btn sell';
+                btn.textContent = '매도';
+            }
+        });
+    });
+
+    // 수량 버튼
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const pct = parseInt(btn.dataset.pct);
+            const qty = Math.floor(1000 * pct / 100);
+            document.getElementById('orderQty').value = qty;
+            updateTotal();
+        });
+    });
+
+    // 총 주문금액 계산
+    function updateTotal() {
+        const price = parseFloat(document.getElementById('orderPrice').value) || 0;
+        const qty = parseInt(document.getElementById('orderQty').value) || 0;
+        const total = price * qty;
+        document.getElementById('totalOrderAmount').textContent = total.toFixed(3) + ' T';
+    }
+
+    document.getElementById('orderPrice').addEventListener('input', updateTotal);
+    document.getElementById('orderQty').addEventListener('input', updateTotal);
+
+    // 주문 버튼
+    document.getElementById('orderBtn').addEventListener('click', () => {
+        const price = document.getElementById('orderPrice').value;
+        const qty = document.getElementById('orderQty').value;
+        const type = document.querySelector('.order-tab.active').dataset.type;
+        const stockName = document.getElementById('selectedStockName').textContent;
+        
+        if (parseInt(qty) <= 0) {
+            alert('주문 수량을 입력하세요.');
+            return;
+        }
+        
+        const totalT = parseFloat(price) * parseInt(qty);
+        const totalKRW = totalT * 1000;
+        
+        alert(`${stockName} ${type === 'buy' ? '매수' : '매도'} 주문\n` +
+              `가격: ${price} T\n` +
+              `수량: ${qty}주\n` +
+              `총액: ${totalT.toFixed(3)} T (₩${totalKRW.toLocaleString()} KRW)\n\n` +
+              `주문이 접수되었습니다.`);
+    });
+
+    // 초기화
+    renderStockList();
+    </script>
+</body>
+</html>

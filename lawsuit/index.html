@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 전자소송 시스템 | 국가데이터처 통합 오픈해시 기반</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; }
+        
+        /* 전자소송 스타일 색상 */
+        :root {
+            --court-blue: #1a4480;
+            --court-blue-dark: #0d2240;
+            --court-gold: #c9a227;
+            --court-red: #b91c1c;
+            --court-green: #166534;
+        }
+        
+        .court-header { background: linear-gradient(135deg, #1a4480 0%, #0d2240 100%); }
+        .court-nav { background: #2d3748; }
+        .court-sidebar { background: #f7fafc; border-right: 1px solid #e2e8f0; }
+        
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
+        
+        .btn-court { 
+            background: linear-gradient(135deg, #1a4480 0%, #2563eb 100%); 
+            transition: all 0.3s;
+        }
+        .btn-court:hover { 
+            background: linear-gradient(135deg, #0d2240 0%, #1d4ed8 100%); 
+            transform: translateY(-1px);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #166534 0%, #22c55e 100%);
+        }
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        }
+        
+        /* 플로팅 버튼 */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            animation: pulse-float 2s ease-in-out infinite;
+        }
+        @keyframes pulse-float {
+            0%, 100% { transform: translateY(0); box-shadow: 0 4px 20px rgba(26,68,128,0.4); }
+            50% { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(26,68,128,0.6); }
+        }
+        
+        /* 오픈해시 배너 */
+        .openhash-banner {
+            background: linear-gradient(90deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            border-bottom: 2px solid #c9a227;
+        }
+        
+        /* 탭 스타일 */
+        .tab-active { 
+            border-bottom: 3px solid #c9a227; 
+            color: #c9a227;
+            font-weight: bold;
+        }
+        
+        /* 사이드바 메뉴 */
+        .sidebar-menu-item {
+            padding: 12px 16px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .sidebar-menu-item:hover {
+            background: #edf2f7;
+            border-left-color: #1a4480;
+        }
+        .sidebar-menu-item.active {
+            background: #e2e8f0;
+            border-left-color: #c9a227;
+            font-weight: 600;
+        }
+        
+        /* AI 채팅 스타일 */
+        .ai-message {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #1a4480;
+        }
+        .user-message {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #166534;
+        }
+        
+        /* 모달 오버레이 */
+        .modal-overlay {
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #1a4480; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0d2240; }
+        
+        /* 상태 배지 */
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-progress { background: #dbeafe; color: #1e40af; }
+        .status-complete { background: #dcfce7; color: #166534; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        
+        /* 로딩 애니메이션 */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-spin { animation: spin 1s linear infinite; }
+        
+        /* AI 타이핑 효과 */
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+        .typing-dot { animation: typing 1.4s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+    <link rel="stylesheet" href="/common/floating-chat.css">
+    <script src="/common/floating-chat.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- 데모 배너 -->
+        <div style="background:#4B5563;color:white;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+        <p style="font-size:14px;font-weight:600;margin:0;">⚠️ 본 사이트는 OpenHash 기술의 실증을 위한 데모 시스템입니다 (실제 정부 서비스 아님)</p>
+        <div style="display:flex;gap:20px;">
+            <a href="http://100.30.14.224/openhash-system/" style="color:white;text-decoration:none;font-size:14px;font-weight:600;display:flex;align-items:center;gap:4px;">
+                <span>Openhash</span>
+                <i class="fas fa-question-circle" style="font-size:16px;"></i>
+            </a>
+            <a href="http://100.30.14.224/national-data-registry/" style="color:white;text-decoration:underline;font-size:14px;font-weight:600;">국가 데이터처</a>
+        </div>
+    </div>
+    <div id="root"></div>
+    
+    <!-- React 컴포넌트 로드 -->
+    <script type="text/babel" src="js/components/Header.js"></script>
+    <script type="text/babel" src="js/components/Navigation.js"></script>
+    <script type="text/babel" src="js/components/Dashboard.js"></script>
+    <script type="text/babel" src="js/components/SystemExplainer.js"></script>
+    <script type="text/babel" src="js/components/ComplaintDrafting.js"></script>
+    <script type="text/babel" src="js/components/AnswerDrafting.js"></script>
+    <script type="text/babel" src="js/components/BriefDrafting.js"></script>
+    <script type="text/babel" src="js/components/CaseManagement.js"></script>
+    <script type="text/babel" src="js/components/WinRatePrediction.js"></script>
+    <script type="text/babel" src="js/components/PrecedentSearch.js"></script>
+    <script type="text/babel" src="js/components/GlobalComparison.js"></script>
+    <script type="text/babel" src="js/components/TrialSimulation.js"></script>
+    <script type="text/babel" src="js/components/AIConsultation.js"></script>
+    <script type="text/babel" src="js/components/FeePayment.js"></script>
+    <script type="text/babel" src="js/components/LegislativeFeedback.js"></script>
+    <script type="text/babel" src="js/components/CostCalculator.js"></script>
+    <script type="text/babel" src="js/components/DraftDocuments.js"></script>
+    <script type="text/babel" src="js/components/NotificationService.js"></script>
+    <script type="text/babel" src="js/components/ElectronicService.js"></script>
+    <script type="text/babel" src="js/components/RecordViewer.js"></script>
+    <script type="text/babel" src="js/components/DocumentIssuance.js"></script>
+    <script type="text/babel" src="js/components/PaymentOrder.js"></script>
+    <script type="text/babel" src="js/app.js"></script>
+</body>
+</html>

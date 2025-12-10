@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGCT 보유 현황</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .chart-card h3 {
+            font-size: var(--font-md);
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+        
+        .chart-container.lg {
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="top-header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>EGCT 거래소</h1>
+            <div class="header-buttons" style="display:flex; gap:12px;">
+                <a href="http://100.30.14.224/portal/" class="header-btn" style="background:rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:14px; display:flex; align-items:center; gap:6px; transition:background 0.2s;"><i class="fas fa-question-circle"></i> 포털</a>
+                <a href="http://100.30.14.224/openhash-system/" class="header-btn" style="background:rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:14px; display:flex; align-items:center; gap:6px; transition:background 0.2s;"><i class="fas fa-question-circle"></i> OpenHash</a>
+            </div>
+        </div>
+    </div>
+    <div class="tab-nav">
+        <div class="tab-nav-inner">
+            <a href="trading.html" class="tab"><i class="fas fa-exchange-alt"></i>EGCT 거래</a>
+            <a href="hashchain-demo.html" class="tab"><i class="fas fa-link"></i>오픈해시</a>
+            <a href="abdc.html" class="tab"><i class="fas fa-gem"></i>ABDC 화폐</a>
+            <a href="pool.html" class="tab"><i class="fas fa-cubes"></i>자산 POOL</a>
+            <a href="exchange.html" class="tab"><i class="fas fa-chart-line"></i>자산 거래소</a>
+            <a href="holders.html" class="tab active"><i class="fas fa-users"></i>EGCT 보유 현황</a>
+            <a href="prices.html" class="tab"><i class="fas fa-chart-line"></i>가격 동향</a>
+            <a href="mypage.html" class="tab"><i class="fas fa-user-circle"></i>My Page</a>
+            <a href="pdv.html" class="tab"><i class="fas fa-vault"></i>My PDV</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="update-time">기준일시: 2025년 12월 8일 23:00 KST</div>
+        
+        <div class="grid-5 mb-lg">
+            <div class="summary-card">
+                <div class="label">총 발행량</div>
+                <div class="value">120,000 T</div>
+                <div class="sub">Max: 1,000,000 T</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">유통량</div>
+                <div class="value">98,400 T</div>
+                <div class="change up"><i class="fas fa-arrow-up"></i> +2.4%</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">총 보유자 수</div>
+                <div class="value">64명</div>
+                <div class="change up"><i class="fas fa-arrow-up"></i> +8명</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">평균 보유량</div>
+                <div class="value">1,538 T</div>
+                <div class="sub">중앙값: 600 T</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">현재가</div>
+                <div class="value">₩1,005</div>
+                <div class="change up"><i class="fas fa-arrow-up"></i> +0.5%</div>
+            </div>
+        </div>
+        
+        <div class="grid-3 mb-lg">
+            <div class="chart-card">
+                <h3><i class="fas fa-globe"></i> 국가별 분포</h3>
+                <div class="chart-container"><canvas id="chartCountry"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-industry"></i> 산업별 분포</h3>
+                <div class="chart-container"><canvas id="chartIndustry"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-building"></i> 기업 규모별 분포</h3>
+                <div class="chart-container"><canvas id="chartCompanySize"></canvas></div>
+            </div>
+        </div>
+        
+        <div class="grid-3 mb-lg">
+            <div class="chart-card">
+                <h3><i class="fas fa-venus-mars"></i> 성별 분포</h3>
+                <div class="chart-container"><canvas id="chartGender"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-birthday-cake"></i> 연령별 분포</h3>
+                <div class="chart-container"><canvas id="chartAge"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-layer-group"></i> 보유량 구간별</h3>
+                <div class="chart-container"><canvas id="chartHolding"></canvas></div>
+            </div>
+        </div>
+        
+        <div class="grid-2 mb-lg">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> 월별 보유자 수 추이</h3>
+                <div class="chart-container lg"><canvas id="chartTrend"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-trophy"></i> 상위 보유자 현황</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>순위</th><th>보유자 ID</th><th>보유량</th><th>비중</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td class="text-primary font-bold">USER_01</td><td class="num">30,000 T</td><td class="num">25.0%</td></tr>
+                        <tr><td>2</td><td class="text-primary font-bold">USER_07</td><td class="num">10,000 T</td><td class="num">8.3%</td></tr>
+                        <tr><td>3</td><td class="text-primary font-bold">USER_25</td><td class="num">6,000 T</td><td class="num">5.0%</td></tr>
+                        <tr><td>4</td><td class="text-primary font-bold">USER_18</td><td class="num">3,000 T</td><td class="num">2.5%</td></tr>
+                        <tr><td>5</td><td class="text-primary font-bold">USER_57</td><td class="num">3,000 T</td><td class="num">2.5%</td></tr>
+                        <tr><td>6</td><td class="text-primary font-bold">USER_08</td><td class="num">2,000 T</td><td class="num">1.7%</td></tr>
+                        <tr><td>7</td><td class="text-primary font-bold">USER_10</td><td class="num">2,000 T</td><td class="num">1.7%</td></tr>
+                        <tr><td>8</td><td class="text-primary font-bold">USER_13</td><td class="num">2,000 T</td><td class="num">1.7%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="grid-3">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> 집중도 지표</h3>
+                <div class="stat-row"><span class="label">상위 1% 보유 비중</span><span class="value">25.0%</span></div>
+                <div class="stat-row"><span class="label">상위 5% 보유 비중</span><span class="value">42.5%</span></div>
+                <div class="stat-row"><span class="label">상위 10% 보유 비중</span><span class="value">55.8%</span></div>
+                <div class="stat-row"><span class="label">지니 계수</span><span class="value">0.68</span></div>
+                <div class="stat-row"><span class="label">허핀달-허쉬만 지수</span><span class="value">842</span></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-exchange-alt"></i> 거래 활동 지표</h3>
+                <div class="stat-row"><span class="label">일일 활성 거래자</span><span class="value">18명 (28.1%)</span></div>
+                <div class="stat-row"><span class="label">주간 활성 거래자</span><span class="value">34명 (53.1%)</span></div>
+                <div class="stat-row"><span class="label">월간 활성 거래자</span><span class="value">52명 (81.3%)</span></div>
+                <div class="stat-row"><span class="label">평균 거래 빈도</span><span class="value">2.4회/주</span></div>
+                <div class="stat-row"><span class="label">평균 거래 규모</span><span class="value">245 T</span></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-clock"></i> 보유 기간 분포</h3>
+                <div class="stat-row"><span class="label">1개월 미만</span><span class="value">12명 (18.8%)</span></div>
+                <div class="progress-bar"><div class="fill" style="width:18.8%;background:#90caf9;"></div></div>
+                <div class="stat-row"><span class="label">1-3개월</span><span class="value">18명 (28.1%)</span></div>
+                <div class="progress-bar"><div class="fill" style="width:28.1%;background:#64b5f6;"></div></div>
+                <div class="stat-row"><span class="label">3-6개월</span><span class="value">22명 (34.4%)</span></div>
+                <div class="progress-bar"><div class="fill" style="width:34.4%;background:#42a5f5;"></div></div>
+                <div class="stat-row"><span class="label">6개월 이상</span><span class="value">12명 (18.8%)</span></div>
+                <div class="progress-bar"><div class="fill" style="width:18.8%;background:#1e88e5;"></div></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+var colors = ['#003566','#0055a5','#0077cc','#3399dd','#66bbee','#99ccff'];
+
+new Chart(document.getElementById('chartCountry'), {
+    type: 'doughnut',
+    data: {
+        labels: ['대한민국', '미국', '일본', '싱가포르', '기타'],
+        datasets: [{ data: [78, 10, 5, 4, 3], backgroundColor: colors }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 12 } } } } }
+});
+
+new Chart(document.getElementById('chartIndustry'), {
+    type: 'bar',
+    data: {
+        labels: ['IT/테크', '금융', '제조', '서비스', '공공', '기타'],
+        datasets: [{ data: [24, 12, 10, 8, 6, 4], backgroundColor: '#003566' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('chartCompanySize'), {
+    type: 'doughnut',
+    data: {
+        labels: ['개인', '스타트업', '중소기업', '중견기업', '대기업'],
+        datasets: [{ data: [45, 20, 18, 10, 7], backgroundColor: colors }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 12 } } } } }
+});
+
+new Chart(document.getElementById('chartGender'), {
+    type: 'pie',
+    data: {
+        labels: ['남성', '여성', '기업/단체'],
+        datasets: [{ data: [58, 27, 15], backgroundColor: ['#003566', '#0077cc', '#99ccff'] }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 12 } } } } }
+});
+
+new Chart(document.getElementById('chartAge'), {
+    type: 'bar',
+    data: {
+        labels: ['20대', '30대', '40대', '50대', '60대+'],
+        datasets: [{ data: [8, 22, 18, 12, 4], backgroundColor: ['#cce5ff', '#66bbee', '#0077cc', '#003566', '#001d3d'] }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('chartHolding'), {
+    type: 'bar',
+    data: {
+        labels: ['~500T', '500~1K', '1K~2K', '2K~5K', '5K~10K', '10K+'],
+        datasets: [{ data: [28, 14, 12, 6, 2, 2], backgroundColor: '#0055a5' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('chartTrend'), {
+    type: 'line',
+    data: {
+        labels: ['7월', '8월', '9월', '10월', '11월', '12월'],
+        datasets: [
+            { label: '보유자 수', data: [42, 48, 52, 56, 60, 64], borderColor: '#003566', backgroundColor: 'rgba(0,53,102,0.1)', fill: true, tension: 0.3 },
+            { label: '유통량 (천T)', data: [72, 78, 84, 90, 94, 98], borderColor: '#0077cc', borderDash: [5, 5], tension: 0.3 }
+        ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } } }
+});
+</script>
+</body>
+</html>
