@@ -14,26 +14,6 @@
         box-shadow: 0 4px 12px rgba(0,61,130,0.2);
     }
 
-    .pdv-info-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-
-    .pdv-info-title {
-        font-size: 1.5em;
-        font-weight: 700;
-    }
-
-    .pdv-info-badge {
-        background: rgba(255,255,255,0.2);
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.9em;
-        font-weight: 600;
-    }
-
     .pdv-info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -41,21 +21,23 @@
         margin-top: 20px;
     }
 
-    .pdv-info-item {
+    .info-item {
         background: rgba(255,255,255,0.1);
         padding: 16px;
         border-radius: 6px;
     }
 
-    .pdv-info-label {
+    .info-label {
         font-size: 0.85em;
         opacity: 0.8;
         margin-bottom: 6px;
+        display: block;
     }
 
-    .pdv-info-value {
+    .info-value {
         font-size: 1.1em;
         font-weight: 600;
+        display: block;
     }
 
     .documents-section {
@@ -66,31 +48,14 @@
         margin-bottom: 40px;
     }
 
-    .documents-header {
-        margin-bottom: 24px;
-        padding-bottom: 16px;
-        border-bottom: 2px solid #e0e0e0;
-    }
-
-    .documents-title {
-        font-size: 1.3em;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-    }
-
-    .documents-subtitle {
-        color: #666;
-        font-size: 0.95em;
-    }
-
-    .documents-grid {
+    .docs-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 16px;
+        margin-top: 20px;
     }
 
-    .document-btn {
+    .doc-card {
         background: linear-gradient(135deg, #f5f8fb 0%, #ffffff 100%);
         border: 2px solid #d5d5d5;
         border-radius: 8px;
@@ -101,41 +66,59 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
+        position: relative;
     }
 
-    .document-btn:hover {
+    .doc-card:hover {
         border-color: #003d82;
-        background: linear-gradient(135deg, #ffffff 0%, #f5f8fb 100%);
-        transform: translateY(-4px);
-        box-shadow: 0 6px 16px rgba(0,61,130,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,61,130,0.15);
     }
 
-    .document-icon {
-        font-size: 2.5em;
+    .doc-card.has-doc {
+        border-color: #2e7d32;
+        background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
     }
 
-    .document-name {
+    .doc-icon {
+        font-size: 2em;
+    }
+
+    .doc-name {
         font-weight: 600;
         color: #333;
-        font-size: 0.95em;
+        font-size: 0.9em;
     }
 
-    .document-status {
-        font-size: 0.8em;
+    .doc-status {
+        font-size: 0.75em;
         padding: 4px 12px;
         border-radius: 12px;
         font-weight: 600;
     }
 
-    .status-available {
-        background: #e8f5e9;
-        color: #2e7d32;
+    .doc-card.has-doc .doc-status {
+        background: #c8e6c9;
+        color: #1b5e20;
     }
 
-    .status-missing {
-        background: #ffebee;
-        color: #c62828;
+    .doc-card.no-doc .doc-status {
+        background: #ffcdd2;
+        color: #b71c1c;
+    }
+
+    .doc-delete {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 1.2em;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .doc-card.has-doc:hover .doc-delete {
+        opacity: 1;
     }
 
     .activities-section {
@@ -145,442 +128,113 @@
         padding: 32px;
     }
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-
-    .section-title {
-        font-size: 1.3em;
-        font-weight: 700;
-        color: #1a1a1a;
-    }
-
-    .search-box {
-        padding: 8px 16px;
-        border: 1px solid #d5d5d5;
-        border-radius: 4px;
-        width: 300px;
-    }
-
-    .timeline {
-        position: relative;
-        padding-left: 40px;
-    }
-
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 16px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #e0e0e0;
-    }
-
-    .timeline-item {
-        position: relative;
-        margin-bottom: 32px;
+    .activity-item {
         background: #f9f9f9;
         border-radius: 6px;
-        padding: 20px;
+        padding: 16px;
+        margin-bottom: 12px;
         border-left: 3px solid #003d82;
     }
 
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -27px;
-        top: 24px;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
+    .activity-number {
+        display: inline-block;
         background: #003d82;
-        border: 3px solid white;
-        box-shadow: 0 0 0 2px #e0e0e0;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 600;
+        margin-right: 8px;
     }
 
-    .timeline-header {
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        max-width: 500px;
+        width: 90%;
+    }
+
+    .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
+        padding: 24px 30px;
+        border-bottom: 1px solid #ecf0f1;
     }
 
-    .timeline-type {
-        display: inline-block;
-        padding: 4px 12px;
-        background: #e3f2fd;
-        color: #1976d2;
-        border-radius: 12px;
-        font-size: 0.85em;
-        font-weight: 600;
+    .modal-body {
+        padding: 30px;
     }
 
-    .timeline-date {
-        font-size: 0.9em;
-        color: #666;
-    }
-
-    .timeline-content {
-        color: #333;
-        margin-bottom: 8px;
-    }
-
-    .timeline-metadata {
-        font-size: 0.85em;
-        color: #666;
-    }
-
-    .btn-create-hash {
-        background: #2e7d32;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.2s;
-        margin-top: 24px;
-    }
-
-    .btn-create-hash:hover {
-        background: #1b5e20;
-        box-shadow: 0 4px 12px rgba(46,125,50,0.3);
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #999;
-    }
-
-    .empty-state-icon {
-        font-size: 4em;
-        margin-bottom: 16px;
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 20px 30px;
+        border-top: 1px solid #ecf0f1;
     }
 </style>
 
 <div class="mypage-container">
     <!-- PDV 정보 섹션 -->
-    <div id="pdv-info-section" class="pdv-info-section"></div>
+    <div class="pdv-info-section">
+        <h2 style="margin: 0 0 20px 0; font-size: 1.5em;">🔐 Private Data Vault</h2>
+        <div id="pdv-info-container"></div>
+    </div>
 
     <!-- 필요 서류 섹션 -->
-    <div id="documents-section" class="documents-section"></div>
+    <div class="documents-section">
+        <h2 style="margin: 0 0 20px 0; font-size: 1.3em;">📄 필요 서류</h2>
+        <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+            ⚠️ 이 서류들은 본인만 접근할 수 있습니다.
+        </p>
+        <div id="required-docs-container"></div>
+    </div>
 
     <!-- 활동 타임라인 섹션 -->
     <div class="activities-section">
-        <div class="section-header">
-            <h2 class="section-title">📋 PDV 활동 타임라인</h2>
-            <input type="text" id="activity-search" class="search-box" placeholder="활동 검색...">
-        </div>
-        
-        <div id="timeline-container" class="timeline"></div>
-        
+        <h2 style="margin: 0 0 20px 0; font-size: 1.3em;">📋 PDV 활동 타임라인</h2>
+        <input type="text" id="activity-search" placeholder="활동 검색..." 
+               style="padding: 8px 12px; border: 1px solid #d5d5d5; border-radius: 4px; width: 300px; margin-bottom: 20px;">
+        <div id="activities-list"></div>
         <div id="create-hash-btn-container"></div>
     </div>
 </div>
 
-<script>
-// My Page 초기화
-function initMyPage() {
-    const user = window.authManager?.getCurrentUser();
-    
-    if (!user) {
-        showEmptyMyPage();
-        return;
-    }
-    
-    displayPDVInfo(user);
-    displayDocuments(user);
-    loadActivities(user);
-}
-
-// PDV 정보 표시
-function displayPDVInfo(user) {
-    const container = document.getElementById('pdv-info-section');
-    
-    let typeInfo = '';
-    let detailsHTML = '';
-    
-    if (user.type === 'citizen') {
-        typeInfo = '🙋 개인';
-        detailsHTML = `
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">이름</div>
-                <div class="pdv-info-value">${user.personData?.name || '-'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">주소</div>
-                <div class="pdv-info-value">${user.personData?.address || '-'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">전화번호</div>
-                <div class="pdv-info-value">${user.phoneNumber}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">이메일</div>
-                <div class="pdv-info-value">${user.personData?.email || '미등록'}</div>
-            </div>
-        `;
-    } else {
-        typeInfo = '🏢 ' + (user.orgData?.orgType || '단체');
-        detailsHTML = `
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">단체명</div>
-                <div class="pdv-info-value">${user.orgData?.name || '-'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">단체 종류</div>
-                <div class="pdv-info-value">${user.orgData?.orgType || '-'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">주소</div>
-                <div class="pdv-info-value">${user.orgData?.address || '-'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">전화번호</div>
-                <div class="pdv-info-value">${user.phoneNumber}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">이메일</div>
-                <div class="pdv-info-value">${user.orgData?.email || '미등록'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">대표자</div>
-                <div class="pdv-info-value">${user.orgData?.ceo || '미등록'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">사업자등록번호</div>
-                <div class="pdv-info-value">${user.orgData?.businessNumber || '미등록'}</div>
-            </div>
-            <div class="pdv-info-item">
-                <div class="pdv-info-label">법인등록번호</div>
-                <div class="pdv-info-value">${user.orgData?.corporateNumber || '미등록'}</div>
-            </div>
-        `;
-    }
-    
-    container.innerHTML = `
-        <div class="pdv-info-header">
-            <div class="pdv-info-title">Private Data Vault</div>
-            <div class="pdv-info-badge">${typeInfo}</div>
+<!-- 서류 추가 모달 -->
+<div id="add-document-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin: 0;">📄 서류 추가</h2>
+            <button onclick="closeAddDocumentModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #95a5a6;">×</button>
         </div>
-        <div class="pdv-info-item">
-            <div class="pdv-info-label">PDV ID</div>
-            <div class="pdv-info-value">${user.pdvId}</div>
-        </div>
-        <div class="pdv-info-item">
-            <div class="pdv-info-label">생성일</div>
-            <div class="pdv-info-value">${new Date(user.createdAt).toLocaleDateString('ko-KR')}</div>
-        </div>
-        <div class="pdv-info-grid">
-            ${detailsHTML}
-        </div>
-    `;
-}
-
-// 필요 서류 표시
-function displayDocuments(user) {
-    const container = document.getElementById('documents-section');
-    
-    let documents = [];
-    let title = '';
-    
-    if (user.type === 'citizen') {
-        documents = [
-            { name: '주민등록증', icon: '🪪', viewable: true },
-            { name: '주민등록표 등본', icon: '📄', viewable: true },
-            { name: '주민등록표 초본', icon: '📄', viewable: true },
-            { name: '인감증명서', icon: '🔏', viewable: true },
-            { name: '본인서명사실확인서', icon: '✍️', viewable: true },
-            { name: '가족관계증명서', icon: '👨‍👩‍👧‍👦', viewable: true },
-            { name: '건강보험자격득실확인서', icon: '🏥', viewable: true },
-            { name: '소득금액증명원', icon: '💰', viewable: true },
-            { name: '재산세납세증명서', icon: '🏠', viewable: true }
-        ];
-        title = '개인 필요 서류';
-    } else {
-        const orgType = user.orgData?.orgType;
-        
-        // 주식회사 기본 서류
-        documents = [
-            { name: '법인등기부등본', icon: '📋', viewable: true },
-            { name: '사업자등록증', icon: '🏢', viewable: true },
-            { name: '정관', icon: '📜', viewable: true },
-            { name: '주주명부', icon: '📊', viewable: true },
-            { name: '법인인감증명서', icon: '🔏', viewable: true },
-            { name: '재무제표', icon: '💼', viewable: true },
-            { name: '손익계산서', icon: '📈', viewable: true },
-            { name: '재무상태표', icon: '📉', viewable: true },
-            { name: '법인세신고서', icon: '📝', viewable: true },
-            { name: '임대차계약서', icon: '🏢', viewable: true }
-        ];
-        
-        title = `${orgType} 필요 서류`;
-    }
-    
-    const userDocuments = user.documents || [];
-    
-    let documentsHTML = documents.map(doc => {
-        const hasDocument = userDocuments.some(d => d.name === doc.name);
-        const statusClass = hasDocument ? 'status-available' : 'status-missing';
-        const statusText = hasDocument ? '보유' : '미보유';
-        
-        return `
-            <button class="document-btn" onclick="handleDocumentClick('${doc.name}', ${hasDocument})">
-                <div class="document-icon">${doc.icon}</div>
-                <div class="document-name">${doc.name}</div>
-                <span class="document-status ${statusClass}">${statusText}</span>
-            </button>
-        `;
-    }).join('');
-    
-    container.innerHTML = `
-        <div class="documents-header">
-            <h2 class="documents-title">📄 ${title}</h2>
-            <p class="documents-subtitle">
-                ⚠️ 이 서류들은 본인만 접근할 수 있습니다. 타인에게 공유하거나 전송하려면 별도의 권한 부여가 필요합니다.
-            </p>
-        </div>
-        <div class="documents-grid">
-            ${documentsHTML}
-        </div>
-    `;
-}
-
-// 서류 클릭 핸들러
-function handleDocumentClick(docName, hasDocument) {
-    if (hasDocument) {
-        alert(`"${docName}" 보기 기능은 준비 중입니다.`);
-    } else {
-        alert(`"${docName}" 업로드 기능은 준비 중입니다.`);
-    }
-}
-
-// 활동 로드 (이전과 동일)
-function loadActivities(user) {
-    const activities = user.activities || [];
-    const container = document.getElementById('timeline-container');
-    
-    if (activities.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <p style="font-size: 1.1em; margin-bottom: 8px;">아직 활동이 없습니다</p>
-                <p style="color: #999;">AI 상담, 문서 전송 등의 활동이 여기에 기록됩니다</p>
+        <div class="modal-body">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">서류 종류 검색</label>
+            <input type="text" id="document-name-input" list="document-list" 
+                   placeholder="서류 이름을 입력하거나 선택하세요"
+                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+            <datalist id="document-list"></datalist>
+            <div style="margin-top: 20px; color: #7f8c8d; font-size: 13px;">
+                💡 드롭다운에서 서류를 선택하거나 직접 입력할 수 있습니다.
             </div>
-        `;
-        document.getElementById('create-hash-btn-container').innerHTML = '';
-        return;
-    }
-    
-    const sortedActivities = activities.sort((a, b) => 
-        new Date(a.timestamp) - new Date(b.timestamp)
-    );
-    
-    sortedActivities.forEach((activity, index) => {
-        activity.serialNumber = index + 1;
-    });
-    
-    let html = sortedActivities.map(activity => `
-        <div class="timeline-item">
-            <div class="timeline-header">
-                <span class="timeline-type">#${activity.serialNumber} - ${activity.type}</span>
-                <span class="timeline-date">${new Date(activity.timestamp).toLocaleString('ko-KR')}</span>
-            </div>
-            <div class="timeline-content">${activity.content}</div>
-            ${activity.counterparty ? `<div class="timeline-metadata">상대방: ${activity.counterparty}</div>` : ''}
-            ${activity.location ? `<div class="timeline-metadata">장소: ${activity.location}</div>` : ''}
         </div>
-    `).join('');
-    
-    container.innerHTML = html;
-    
-    if (activities.length >= 5) {
-        document.getElementById('create-hash-btn-container').innerHTML = `
-            <button class="btn-create-hash" onclick="createOpenHashGroups()">
-                🔗 OpenHash 생성 (${activities.length}개 활동)
-            </button>
-        `;
-    }
-}
-
-// OpenHash 생성
-async function createOpenHashGroups() {
-    const user = window.authManager?.getCurrentUser();
-    if (!user || !user.activities) return;
-    
-    const activities = user.activities;
-    
-    if (activities.length < 5) {
-        alert('OpenHash를 생성하려면 최소 5개의 활동이 필요합니다.');
-        return;
-    }
-    
-    try {
-        const groups = await window.openHashManager.createHashGroups(activities);
-        
-        groups.forEach(group => {
-            window.openHashManager.saveHashRecord(group, user.pdvId);
-        });
-        
-        alert(`✅ ${groups.length}개의 OpenHash 그룹이 생성되었습니다!`);
-        
-        if (confirm('OpenHash 탭에서 확인하시겠습니까?')) {
-            if (typeof switchTab === 'function') {
-                switchTab('openhash');
-            }
-        }
-        
-        document.getElementById('create-hash-btn-container').innerHTML = `
-            <button class="btn-create-hash" disabled style="opacity: 0.5; cursor: not-allowed;">
-                ✓ OpenHash 생성됨
-            </button>
-        `;
-    } catch (error) {
-        console.error('OpenHash 생성 오류:', error);
-        alert('OpenHash 생성 중 오류가 발생했습니다.');
-    }
-}
-
-// 빈 My Page 표시
-function showEmptyMyPage() {
-    document.querySelector('.mypage-container').innerHTML = `
-        <div class="empty-state" style="padding: 100px 20px;">
-            <div class="empty-state-icon">🔐</div>
-            <h2 style="margin-bottom: 12px;">로그인이 필요합니다</h2>
-            <p style="color: #666; margin-bottom: 24px;">Private Data Vault에 접근하려면 로그인하세요</p>
-            <button onclick="openLoginModal()" style="padding: 12px 32px; background: #003d82; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 1em;">
-                로그인하기
-            </button>
+        <div class="modal-footer">
+            <button onclick="closeAddDocumentModal()" style="padding: 10px 20px; background: #ecf0f1; border: none; border-radius: 6px; cursor: pointer;">취소</button>
+            <button onclick="addDocumentToPDV()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">추가</button>
         </div>
-    `;
-}
-
-// 검색 기능
-document.addEventListener('DOMContentLoaded', function() {
-    const searchBox = document.getElementById('activity-search');
-    if (searchBox) {
-        searchBox.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.timeline-item');
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    }
-});
-
-if (typeof window.initMyPage === 'undefined') {
-    window.initMyPage = initMyPage;
-}
-</script>
+    </div>
+</div>
