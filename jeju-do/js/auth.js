@@ -80,10 +80,19 @@ class AuthManager {
         // PDV Manager에서 검색
         if (window.pdvManager) {
             const allPDVs = window.pdvManager.getAllPDVs();
-            console.log('전체 PDV 수:', allPDVs.length);
-            return allPDVs.find(pdv => pdv.phoneNumber === phoneNumber);
+            console.log("전체 PDV 수:", allPDVs.length);
+            
+            // 배열인지 확인
+            if (!Array.isArray(allPDVs)) {
+                console.error("getAllPDVs가 배열을 반환하지 않음:", typeof allPDVs);
+                return null;
+            }
+            
+            const found = allPDVs.find(pdv => pdv.phoneNumber === phoneNumber);
+            console.log("PDV 검색 결과:", found ? "찾음" : "없음");
+            return found;
         }
-        console.warn('pdvManager가 초기화되지 않았습니다');
+        console.warn("pdvManager가 초기화되지 않았습니다");
         return null;
     }
 
