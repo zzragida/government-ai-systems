@@ -2,7 +2,7 @@
 
 let currentDocumentName = null; // 현재 선택된 서류
 
-function loadMyPageData() {
+async function loadMyPageData() {
     console.log('My Page 데이터 로드 시작');
     
     if (!window.authManager || !window.authManager.getCurrentUser()) {
@@ -10,7 +10,7 @@ function loadMyPageData() {
         return;
     }
     
-    const user = window.authManager.getCurrentUser();
+    const user = await window.authManager.getCurrentUser();
     console.log('현재 사용자:', user);
     
     // 이중 리스트박스 표시
@@ -209,7 +209,7 @@ function displayDualListBox(user) {
 }
 
 // 선택한 서류를 보유 목록으로 추가
-function addSelectedDocuments() {
+async function addSelectedDocuments() {
     const availableSelect = document.getElementById('available-docs');
     const selectedOptions = Array.from(availableSelect.selectedOptions);
     
@@ -255,13 +255,13 @@ function addSelectedDocuments() {
     }
     
     // UI 새로고침
-    loadMyPageData();
+    await loadMyPageData();
     
     alert(`${selectedOptions.length}개 서류가 추가되었습니다.`);
 }
 
 // 선택한 서류를 보유 목록에서 제거
-function removeSelectedDocuments() {
+async function removeSelectedDocuments() {
     const ownedSelect = document.getElementById('owned-docs');
     const selectedOptions = Array.from(ownedSelect.selectedOptions);
     
@@ -289,13 +289,13 @@ function removeSelectedDocuments() {
     }
     
     // UI 새로고침
-    loadMyPageData();
+    await loadMyPageData();
     
     alert(`${selectedOptions.length}개 서류가 제거되었습니다.`);
 }
 
 // 보유 서류 선택 시 액션 버튼 표시
-function handleOwnedDocSelection() {
+async function handleOwnedDocSelection() {
     const ownedSelect = document.getElementById('owned-docs');
     const actionsDiv = document.getElementById('document-actions');
     const selectedDocName = document.getElementById('selected-doc-name');
@@ -310,7 +310,7 @@ function handleOwnedDocSelection() {
     }
 }
 
-function displayActivities(user) {
+async function displayActivities(user) {
     const container = document.getElementById('activities-list');
     if (!container) {
         console.error('activities-list를 찾을 수 없음');
@@ -371,37 +371,37 @@ function displayActivities(user) {
 }
 
 // My Page 탭이 열릴 때 자동 로드
-function showMyPage() {
+async function showMyPage() {
     console.log("showMyPage 호출됨");
     switchTab("mypage");
     
     // 즉시 실행 + 지연 실행 (이중 보장)
-    loadMyPageData();
+    await loadMyPageData();
     
-    setTimeout(() => {
+    setTimeout(async () => {
         console.log("setTimeout에서 loadMyPageData 재실행");
-        loadMyPageData();
+        await loadMyPageData();
     }, 100);
     
-    setTimeout(() => {
+    setTimeout(async () => {
         console.log("500ms 후 loadMyPageData 재실행");
-        loadMyPageData();
+        await loadMyPageData();
     }, 500);
 }
 
 // 서류 액션 함수들
-function handleDocumentView() {
+async function handleDocumentView() {
     if (!currentDocumentName) return;
     alert(`"${currentDocumentName}" 열람 기능은 준비 중입니다.`);
 }
 
-function handleDocumentRenew() {
+async function handleDocumentRenew() {
     if (!currentDocumentName) return;
     alert(`"${currentDocumentName}" 갱신 기능은 준비 중입니다.`);
 }
 
 // 수신자 선택 모달
-function showRecipientSelector() {
+async function showRecipientSelector() {
     if (!currentDocumentName) return;
     
     const modal = document.getElementById('recipient-selector-modal');
@@ -499,7 +499,7 @@ function selectRecipient(recipientId, recipientName) {
     }
 }
 
-function sendDocument(recipientId, recipientName) {
+async function sendDocument(recipientId, recipientName) {
     const user = window.authManager?.getCurrentUser();
     if (!user) return;
     
@@ -526,7 +526,7 @@ function sendDocument(recipientId, recipientName) {
     }
     
     closeRecipientSelectorModal();
-    loadMyPageData();
+    await loadMyPageData();
     
     alert(`✅ "${currentDocumentName}" 서류가 "${recipientName}"에게 전송되었습니다.`);
     currentDocumentName = null;

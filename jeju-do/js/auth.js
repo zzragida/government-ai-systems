@@ -47,7 +47,7 @@ class AuthManager {
         }
         
         // PDV 존재 여부 확인
-        const pdv = this.findPDVByPhone(phoneNumber);
+        const pdv = await this.findPDVByPhone(phoneNumber);
         console.log('PDV 검색 결과:', pdv);
         
         if (pdv) {
@@ -76,10 +76,10 @@ class AuthManager {
         }
     }
 
-    findPDVByPhone(phoneNumber) {
+    async findPDVByPhone(phoneNumber) {
         // PDV Manager에서 검색
         if (window.pdvManager) {
-            const allPDVs = window.pdvManager.getAllPDVs();
+            const allPDVs = await window.pdvManager.getAllPDVs();
             console.log("전체 PDV 수:", allPDVs.length);
             
             // 배열인지 확인
@@ -125,7 +125,7 @@ class AuthManager {
         console.log('생성된 PDV:', newPDV);
         
         // 저장
-        window.pdvManager.savePDV(newPDV);
+        await window.pdvManager.savePDV(newPDV);
         
         // 자동 로그인
         this.currentUser = newPDV;
@@ -148,7 +148,7 @@ class AuthManager {
         }
     }
 
-    getCurrentUser() {
+    async getCurrentUser() {
         return this.currentUser;
     }
 
