@@ -371,24 +371,44 @@ async function displayActivities(user) {
 }
 
 // My Page 탭이 열릴 때 자동 로드
+
 async function showMyPage() {
     console.log("showMyPage 호출됨");
+    
+    // 1. 탭 전환
     switchTab("mypage");
     
-    // 즉시 실행 + 지연 실행 (이중 보장)
-    await loadMyPageData();
+    // 2. HTML이 로드될 때까지 대기
+    await new Promise(resolve => {
+        const checkInterval = setInterval(() => {
+            const container = document.getElementById('required-docs-container');
+            if (container) {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 100);
+        
+        // 5초 타임아웃
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            resolve();
+        }, 5000);
+    });
     
-    setTimeout(async () => {
-        console.log("setTimeout에서 loadMyPageData 재실행");
-        await loadMyPageData();
-    }, 100);
-    
-    setTimeout(async () => {
-        console.log("500ms 후 loadMyPageData 재실행");
-        await loadMyPageData();
-    }, 500);
+    // 3. HTML이 로드되었으면 데이터 로드
+    const container = document.getElementById('required-docs-container');
+    if (container) {
+        console.log("My Page HTML 로드 확인, 데이터 로드 시작");
+        try {
+            await loadMyPageData();
+            console.log("My Page 데이터 로드 완료");
+        } catch (error) {
+            console.error("My Page 데이터 로드 오류:", error);
+        }
+    } else {
+        console.error("My Page HTML 로드 실패");
+    }
 }
-
 // 서류 액션 함수들
 async function handleDocumentView() {
     if (!currentDocumentName) return;

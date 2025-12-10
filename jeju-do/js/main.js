@@ -14,7 +14,29 @@ const tabLoadStatus = {
     seogwipo: false
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // 자동 로그인 처리
+    if (window.authManager) {
+        const userData = localStorage.getItem('currentUser');
+        if (userData) {
+            try {
+                const user = JSON.parse(userData);
+                if (user.pdvId && window.pdvManager) {
+                    console.log('자동 로그인 시도:', user.pdvId);
+                    const latestPDV = await window.pdvManager.getPDVById(user.pdvId);
+                    if (latestPDV) {
+                        window.authManager.currentUser = latestPDV;
+                        localStorage.setItem('currentUser', JSON.stringify(latestPDV));
+                        window.authManager.updateAuthUI();
+                        console.log('자동 로그인 완료 (최신 데이터):', latestPDV);
+                    }
+                }
+            } catch (error) {
+                console.error('자동 로그인 오류:', error);
+            }
+        }
+    }
+
     loadTabContent('dochung');
 
     const tabBtns = document.querySelectorAll('.tab-btn');
