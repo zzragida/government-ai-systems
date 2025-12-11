@@ -318,3 +318,75 @@
     gap: 12px;
     margin-top: 24px;
 }
+
+/* ========================================
+   로그인 모달 (추가)
+   ======================================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#login-modal .modal-content {
+    text-align: center;
+}
+
+#login-modal h2 {
+    margin-bottom: 1rem;
+    color: var(--primary-color, #2c5aa0);
+}
+
+#login-modal input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#login-modal button {
+    padding: 0.75rem 2rem;
+    margin: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#login-modal button[type="submit"] {
+    background-color: var(--primary-color, #2c5aa0);
+    color: white;
+}
+
+#login-modal button[type="submit"]:hover {
+    background-color: var(--primary-dark, #1e3a6d);
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
