@@ -1,6 +1,751 @@
-<main class="max-w-7xl mx-auto px-4 pb-8">
-    <div class="bg-white rounded-lg shadow-md p-8 mt-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">탭4 내용</h2>
-        <p class="text-gray-600">이곳에 탭4의 내용이 표시됩니다.</p>
+<style>
+    body {
+        font-family: 'Noto Sans KR', sans-serif;
+        background-color: #F9FAFB;
+    }
+    .education-container {
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    /* 섹션 제목 */
+    .education-section {
+        margin: 3rem 0;
+    }
+    
+    .section-title {
+        background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 22px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 3px 10px rgba(25, 118, 210, 0.3);
+    }
+    
+    /* 초등학교 그리드 - 한 줄에 6개 */
+    .elementary-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* 중고등학교 그리드 - 한 줄에 6개 */
+    .middle-high-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* 대학교 그리드 - 한 줄에 6개 */
+    .university-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* 학년 카드 */
+    .grade-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .grade-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .grade-header {
+        background: linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%);
+        color: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    /* 과목 리스트 */
+    .subject-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .subject-item {
+        background: #F5F5F5;
+        padding: 0.6rem 1rem;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #424242;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-left: 3px solid #42A5F5;
+    }
+    
+    .subject-item:hover {
+        background: #E3F2FD;
+        border-left-color: #1976D2;
+        transform: translateX(5px);
+    }
+    
+    /* 대학 학부 카드 */
+    .school-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .school-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .school-header {
+        background: linear-gradient(135deg, #8E24AA 0%, #6A1B9A 100%);
+        color: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-align: center;
+        cursor: pointer;
+    }
+    
+    .department-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .department-item {
+        background: #F3E5F5;
+        padding: 0.6rem 1rem;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #4A148C;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-left: 3px solid #8E24AA;
+    }
+    
+    .department-item:hover {
+        background: #E1BEE7;
+        border-left-color: #6A1B9A;
+        transform: translateX(5px);
+    }
+    
+    .course-number {
+        font-size: 11px;
+        color: #7B1FA2;
+        font-weight: 600;
+        margin-left: 0.3rem;
+    }
+    
+    /* AI 상담창 */
+    .chat-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    .chat-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .ai-chat-window {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .ai-chat-window.active {
+        opacity: 1;
+        visibility: visible;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 500px !important;
+        height: 700px !important;
+    }
+    .chat-header {
+        background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease 0.3s;
+    }
+    .ai-chat-window.active .chat-header { opacity: 1; }
+    .chat-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+    .close-chat {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+    .close-chat:hover { background: rgba(255, 255, 255, 0.2); }
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease 0.3s;
+    }
+    .ai-chat-window.active .chat-messages { opacity: 1; }
+    .message {
+        display: flex;
+        gap: 8px;
+        max-width: 85%;
+        animation: messageSlideIn 0.3s ease;
+    }
+    @keyframes messageSlideIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.assistant { align-self: flex-start; }
+    .message-bubble {
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+    .message.user .message-bubble { background: #0066FF; color: white; }
+    .message.assistant .message-bubble { background: #F3F4F6; color: #1F2937; }
+    .chat-input-area {
+        border-top: 1px solid #E5E7EB;
+        padding: 16px;
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+        opacity: 0;
+        transition: opacity 0.3s ease 0.3s;
+    }
+    .ai-chat-window.active .chat-input-area { opacity: 1; }
+    .chat-input {
+        flex: 1;
+        border: 1px solid #E5E7EB;
+        border-radius: 20px;
+        padding: 10px 16px;
+        font-size: 14px;
+        resize: none;
+        max-height: 120px;
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+    .chat-input:focus { outline: none; border-color: #0066FF; }
+    .chat-actions { display: flex; gap: 4px; align-items: center; }
+    .icon-button {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 24px;
+    }
+    .icon-button:hover { background: #F3F4F6; }
+    .send-button { background: #0066FF; color: white; font-size: 20px; }
+    .send-button:hover { background: #0052CC; }
+    .send-button:disabled { background: #E5E7EB; cursor: not-allowed; }
+</style>
+
+<div class="education-container">
+    <!-- 초등학교 -->
+    <div class="education-section">
+        <div class="section-title">🎒 초등학교 (Elementary School)</div>
+        <div class="elementary-grid">
+            <div class="grade-card">
+                <div class="grade-header">1학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '1학년', '초등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '1학년', '초등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '바른생활', '1학년', '초등학교')">바른생활</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '슬기로운생활', '1학년', '초등학교')">슬기로운생활</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '즐거운생활', '1학년', '초등학교')">즐거운생활</div>
+                </div>
+            </div>
+            
+            <div class="grade-card">
+                <div class="grade-header">2학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '2학년', '초등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '2학년', '초등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '바른생활', '2학년', '초등학교')">바른생활</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '슬기로운생활', '2학년', '초등학교')">슬기로운생활</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '즐거운생활', '2학년', '초등학교')">즐거운생활</div>
+                </div>
+            </div>
+            
+            <div class="grade-card">
+                <div class="grade-header">3학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '3학년', '초등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '3학년', '초등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '3학년', '초등학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '3학년', '초등학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '3학년', '초등학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '3학년', '초등학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '3학년', '초등학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '3학년', '초등학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '3학년', '초등학교')">체육</div>
+                </div>
+            </div>
+            
+            <div class="grade-card">
+                <div class="grade-header">4학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '4학년', '초등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '4학년', '초등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '4학년', '초등학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '4학년', '초등학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '4학년', '초등학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '4학년', '초등학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '4학년', '초등학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '4학년', '초등학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '4학년', '초등학교')">체육</div>
+                </div>
+            </div>
+            
+            <div class="grade-card">
+                <div class="grade-header">5학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '5학년', '초등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '5학년', '초등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '5학년', '초등학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '5학년', '초등학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '5학년', '초등학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '실과', '5학년', '초등학교')">실과</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '5학년', '초등학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '5학년', '초등학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '5학년', '초등학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '5학년', '초등학교')">체육</div>
+                </div>
+            </div>
+            
+            <div class="grade-card">
+                <div class="grade-header">6학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '6학년', '초등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '6학년', '초등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '6학년', '초등학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '6학년', '초등학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '6학년', '초등학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '실과', '6학년', '초등학교')">실과</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '6학년', '초등학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '6학년', '초등학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '6학년', '초등학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '6학년', '초등학교')">체육</div>
+                </div>
+            </div>
+        </div>
     </div>
-</main>
+    
+    <!-- 중학교 + 고등학교 -->
+    <div class="education-section">
+        <div class="section-title">📚 중학교 · 고등학교 (Middle School · High School)</div>
+        <div class="middle-high-grid">
+            <!-- 중학교 1학년 -->
+            <div class="grade-card">
+                <div class="grade-header">중 1학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '1학년', '중학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '1학년', '중학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '1학년', '중학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '1학년', '중학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '역사', '1학년', '중학교')">역사</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '1학년', '중학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '기술·가정', '1학년', '중학교')">기술·가정</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '1학년', '중학교')">체육</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '1학년', '중학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '1학년', '중학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '1학년', '중학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '정보', '1학년', '중학교')">정보</div>
+                </div>
+            </div>
+            
+            <!-- 중학교 2학년 -->
+            <div class="grade-card">
+                <div class="grade-header">중 2학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '2학년', '중학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '2학년', '중학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '2학년', '중학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '2학년', '중학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '역사', '2학년', '중학교')">역사</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '2학년', '중학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '기술·가정', '2학년', '중학교')">기술·가정</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '2학년', '중학교')">체육</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '2학년', '중학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '2학년', '중학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '2학년', '중학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '정보', '2학년', '중학교')">정보</div>
+                </div>
+            </div>
+            
+            <!-- 중학교 3학년 -->
+            <div class="grade-card">
+                <div class="grade-header">중 3학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '3학년', '중학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '3학년', '중학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '3학년', '중학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회', '3학년', '중학교')">사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '역사', '3학년', '중학교')">역사</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학', '3학년', '중학교')">과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '기술·가정', '3학년', '중학교')">기술·가정</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '3학년', '중학교')">체육</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악', '3학년', '중학교')">음악</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미술', '3학년', '중학교')">미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '도덕', '3학년', '중학교')">도덕</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '정보', '3학년', '중학교')">정보</div>
+                </div>
+            </div>
+            
+            <!-- 고등학교 1학년 -->
+            <div class="grade-card">
+                <div class="grade-header">고 1학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '국어', '1학년', '고등학교')">국어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학', '1학년', '고등학교')">수학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어', '1학년', '고등학교')">영어</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '한국사', '1학년', '고등학교')">한국사</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '통합사회', '1학년', '고등학교')">통합사회</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '통합과학', '1학년', '고등학교')">통합과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '과학탐구실험', '1학년', '고등학교')">과학탐구실험</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '체육', '1학년', '고등학교')">체육</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '음악/미술', '1학년', '고등학교')">음악/미술</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '기술·가정/정보', '1학년', '고등학교')">기술·가정/정보</div>
+                </div>
+            </div>
+            
+            <!-- 고등학교 2학년 -->
+            <div class="grade-card">
+                <div class="grade-header">고 2학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '문학', '2학년', '고등학교')">문학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '독서', '2학년', '고등학교')">독서</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '수학I/II', '2학년', '고등학교')">수학I/II</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '확률과통계', '2학년', '고등학교')">확률과통계</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어I/II', '2학년', '고등학교')">영어I/II</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '물리학/화학', '2학년', '고등학교')">물리학/화학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '생명과학/지구과학', '2학년', '고등학교')">생명과학/지구과학</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '한국지리/세계지리', '2학년', '고등학교')">한국지리/세계지리</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '동아시아사/세계사', '2학년', '고등학교')">동아시아사/세계사</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '생활과윤리/윤리와사상', '2학년', '고등학교')">생활과윤리/윤리와사상</div>
+                </div>
+            </div>
+            
+            <!-- 고등학교 3학년 -->
+            <div class="grade-card">
+                <div class="grade-header">고 3학년</div>
+                <div class="subject-list">
+                    <div class="subject-item" onclick="openSubjectChat(this, '화법과작문', '3학년', '고등학교')">화법과작문</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '언어와매체', '3학년', '고등학교')">언어와매체</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '미적분/기하', '3학년', '고등학교')">미적분/기하</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '영어독해/작문', '3학년', '고등학교')">영어독해/작문</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '물리학II/화학II', '3학년', '고등학교')">물리학II/화학II</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '생명과학II/지구과학II', '3학년', '고등학교')">생명과학II/지구과학II</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '경제/정치와법', '3학년', '고등학교')">경제/정치와법</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '사회문화', '3학년', '고등학교')">사회문화</div>
+                    <div class="subject-item" onclick="openSubjectChat(this, '제2외국어/한문', '3학년', '고등학교')">제2외국어/한문</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 대학교 (MIT) -->
+    <div class="education-section">
+        <div class="section-title">🏛️ 대학교 (University - MIT Example)</div>
+        
+        <div class="university-grid">
+            <!-- School of Architecture and Planning -->
+            <div class="school-card">
+                <div class="school-header" onclick="openSubjectChat(this, 'School of Architecture and Planning', 'MIT', '대학교')">School of Architecture and Planning</div>
+                <div class="department-list">
+                    <div class="department-item" onclick="openSubjectChat(this, 'Architecture', 'MIT', '대학교')">Architecture <span class="course-number">Course 4</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Media Arts and Sciences', 'MIT', '대학교')">Media Arts and Sciences <span class="course-number">MAS</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Urban Studies and Planning', 'MIT', '대학교')">Urban Studies and Planning <span class="course-number">Course 11</span></div>
+                </div>
+            </div>
+            
+            <!-- School of Engineering -->
+            <div class="school-card">
+                <div class="school-header" onclick="openSubjectChat(this, 'School of Engineering', 'MIT', '대학교')">School of Engineering</div>
+                <div class="department-list">
+                    <div class="department-item" onclick="openSubjectChat(this, 'Aeronautics and Astronautics', 'MIT', '대학교')">Aeronautics and Astronautics <span class="course-number">Course 16</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Biological Engineering', 'MIT', '대학교')">Biological Engineering <span class="course-number">Course 20</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Chemical Engineering', 'MIT', '대학교')">Chemical Engineering <span class="course-number">Course 10</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Civil and Environmental Engineering', 'MIT', '대학교')">Civil and Environmental Engineering <span class="course-number">Course 1</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Electrical Engineering and Computer Science', 'MIT', '대학교')">Electrical Engineering and Computer Science <span class="course-number">Course 6</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Health Sciences and Technology', 'MIT', '대학교')">Health Sciences and Technology <span class="course-number">HST</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Materials Science and Engineering', 'MIT', '대학교')">Materials Science and Engineering <span class="course-number">Course 3</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Mechanical Engineering', 'MIT', '대학교')">Mechanical Engineering <span class="course-number">Course 2</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Nuclear Science and Engineering', 'MIT', '대학교')">Nuclear Science and Engineering <span class="course-number">Course 22</span></div>
+                </div>
+            </div>
+            
+            <!-- School of Humanities, Arts, and Social Sciences -->
+            <div class="school-card">
+                <div class="school-header" onclick="openSubjectChat(this, 'School of Humanities, Arts, and Social Sciences', 'MIT', '대학교')">School of Humanities, Arts, and Social Sciences</div>
+                <div class="department-list">
+                    <div class="department-item" onclick="openSubjectChat(this, 'Anthropology', 'MIT', '대학교')">Anthropology <span class="course-number">Course 21A</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Comparative Media Studies/Writing', 'MIT', '대학교')">Comparative Media Studies/Writing <span class="course-number">CMS/21W</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Economics', 'MIT', '대학교')">Economics <span class="course-number">Course 14</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Global Languages', 'MIT', '대학교')">Global Languages <span class="course-number">Course 21G</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'History', 'MIT', '대학교')">History <span class="course-number">Course 21H</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Linguistics', 'MIT', '대학교')">Linguistics <span class="course-number">Course 24</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Literature', 'MIT', '대학교')">Literature <span class="course-number">Course 21L</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Music and Theater Arts', 'MIT', '대학교')">Music and Theater Arts <span class="course-number">Course 21M</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Philosophy', 'MIT', '대학교')">Philosophy <span class="course-number">Course 24</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Political Science', 'MIT', '대학교')">Political Science <span class="course-number">Course 17</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Science, Technology, and Society', 'MIT', '대학교')">Science, Technology, and Society <span class="course-number">STS</span></div>
+                </div>
+            </div>
+            
+            <!-- Sloan School of Management -->
+            <div class="school-card">
+                <div class="school-header" onclick="openSubjectChat(this, 'Sloan School of Management', 'MIT', '대학교')">Sloan School of Management</div>
+                <div class="department-list">
+                    <div class="department-item" onclick="openSubjectChat(this, 'Management', 'MIT', '대학교')">Management <span class="course-number">Course 15</span></div>
+                </div>
+            </div>
+            
+            <!-- School of Science -->
+            <div class="school-card">
+                <div class="school-header" onclick="openSubjectChat(this, 'School of Science', 'MIT', '대학교')">School of Science</div>
+                <div class="department-list">
+                    <div class="department-item" onclick="openSubjectChat(this, 'Biology', 'MIT', '대학교')">Biology <span class="course-number">Course 7</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Brain and Cognitive Sciences', 'MIT', '대학교')">Brain and Cognitive Sciences <span class="course-number">Course 9</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Chemistry', 'MIT', '대학교')">Chemistry <span class="course-number">Course 5</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Earth, Atmospheric, and Planetary Sciences', 'MIT', '대학교')">Earth, Atmospheric, and Planetary Sciences <span class="course-number">Course 12</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Mathematics', 'MIT', '대학교')">Mathematics <span class="course-number">Course 18</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Physics', 'MIT', '대학교')">Physics <span class="course-number">Course 8</span></div>
+                </div>
+            </div>
+            
+            <!-- MIT Schwarzman College of Computing -->
+            <div class="school-card">
+                <div class="school-header" onclick="openSubjectChat(this, 'MIT Schwarzman College of Computing', 'MIT', '대학교')">MIT Schwarzman College of Computing</div>
+                <div class="department-list">
+                    <div class="department-item" onclick="openSubjectChat(this, 'Data, Systems, and Society', 'MIT', '대학교')">Data, Systems, and Society <span class="course-number">IDS</span></div>
+                    <div class="department-item" onclick="openSubjectChat(this, 'Electrical Engineering and Computer Science', 'MIT', '대학교')">Electrical Engineering and Computer Science <span class="course-number">Course 6</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
+<div class="ai-chat-window" id="aiChatWindow">
+    <div class="chat-header">
+        <h3 id="chatTitle">AI 상담</h3>
+        <button class="close-chat" onclick="closeChat()">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+        <textarea id="chatInput" class="chat-input" placeholder="메시지를 입력하세요..." rows="1"></textarea>
+        <div class="chat-actions">
+            <input type="file" id="fileInput" style="display: none;" accept="image/*,.pdf,.doc,.docx">
+            <button class="icon-button" onclick="document.getElementById('fileInput').click()" style="font-size: 26px;">📎</button>
+            <button class="icon-button send-button" id="sendButton" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+</div>
+
+<div style="padding: 2rem; text-align: center; color: #6B7280; font-size: 14px;">
+    <p>※ 교육 시스템 - 각 과목을 클릭하면 AI 선생님과 상담을 시작할 수 있습니다.</p>
+</div>
+
+<script>
+(function() {
+    const API_URL = '/api/jeju-integrated/chat';
+    let conversationHistory = [];
+    let currentSubject = '';
+    let currentGrade = '';
+    let currentSchool = '';
+
+    window.openSubjectChat = function(element, subject, grade, school) {
+        currentSubject = subject;
+        currentGrade = grade;
+        currentSchool = school;
+        
+        const chatWindow = document.getElementById('aiChatWindow');
+        const chatTitle = document.getElementById('chatTitle');
+        const chatMessages = document.getElementById('chatMessages');
+        const overlay = document.getElementById('chatOverlay');
+        
+        if (!chatWindow || !chatTitle || !chatMessages || !overlay) return;
+        
+        const rect = element.getBoundingClientRect();
+        chatWindow.style.left = rect.left + 'px';
+        chatWindow.style.top = rect.top + 'px';
+        chatWindow.style.width = rect.width + 'px';
+        chatWindow.style.height = rect.height + 'px';
+        chatWindow.style.transform = 'none';
+        
+        chatTitle.textContent = subject + ' 상담';
+        chatMessages.innerHTML = '';
+        conversationHistory = [];
+        overlay.classList.add('active');
+        
+        setTimeout(function() {
+            chatWindow.classList.add('active');
+            let greeting = '안녕하세요! ' + school + ' ' + grade + ' ' + subject + ' AI 선생님입니다. 무엇을 도와드릴까요?';
+            addMessage(greeting, 'assistant');
+        }, 10);
+        
+        setTimeout(function() {
+            const input = document.getElementById('chatInput');
+            if (input) input.focus();
+        }, 600);
+    };
+
+    window.closeChat = function() {
+        const chatWindow = document.getElementById('aiChatWindow');
+        const overlay = document.getElementById('chatOverlay');
+        if (chatWindow) chatWindow.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+    };
+
+    function addMessage(content, role) {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (!messagesContainer) return;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ' + role;
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        bubbleDiv.textContent = content;
+        messageDiv.appendChild(bubbleDiv);
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (!messagesContainer) return;
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message assistant';
+        typingDiv.id = 'typingIndicator';
+        const indicatorDiv = document.createElement('div');
+        indicatorDiv.className = 'typing-indicator';
+        indicatorDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+        typingDiv.appendChild(indicatorDiv);
+        messagesContainer.appendChild(typingDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    }
+
+    window.sendMessage = async function() {
+        const input = document.getElementById('chatInput');
+        if (!input) return;
+        const message = input.value.trim();
+        if (!message) return;
+        addMessage(message, 'user');
+        input.value = '';
+        input.style.height = 'auto';
+        conversationHistory.push({
+            role: 'user',
+            content: '[학교: ' + currentSchool + ', 학년: ' + currentGrade + ', 과목: ' + currentSubject + '] ' + message
+        });
+        const sendButton = document.getElementById('sendButton');
+        if (sendButton) sendButton.disabled = true;
+        showTypingIndicator();
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    messages: conversationHistory,
+                    subject: currentSubject,
+                    grade: currentGrade,
+                    school: currentSchool
+                })
+            });
+            if (!response.ok) throw new Error('API 요청 실패');
+            const responseData = await response.json();
+            conversationHistory.push({
+                role: 'assistant',
+                content: responseData.message
+            });
+            removeTypingIndicator();
+            addMessage(responseData.message, 'assistant');
+        } catch (error) {
+            console.error('Error:', error);
+            removeTypingIndicator();
+            addMessage('죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.', 'assistant');
+        } finally {
+            if (sendButton) sendButton.disabled = false;
+        }
+    };
+
+    setTimeout(function() {
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput && !chatInput.hasAttribute('data-listener-added')) {
+            chatInput.setAttribute('data-listener-added', 'true');
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    window.sendMessage();
+                }
+            });
+        }
+    }, 100);
+})();
+</script>
