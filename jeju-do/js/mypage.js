@@ -5,19 +5,21 @@ let currentDocumentName = null; // 현재 선택된 서류
 async function loadMyPageData() {
     console.log('My Page 데이터 로드 시작');
     
-    if (!window.authManager || !window.authManager.getCurrentUser()) {
-        console.error('로그인되지 않음');
+    // 현재 로그인한 사용자 가져오기
+    const currentUser = await window.authManager.getCurrentUser();
+    console.log('현재 사용자:', currentUser);
+    
+    // 로그인하지 않은 경우 종료
+    if (!currentUser) {
+        console.log('로그인이 필요합니다');
         return;
     }
     
-    const user = await window.authManager.getCurrentUser();
-    console.log('현재 사용자:', user);
-    
     // 이중 리스트박스 표시
-    displayDualListBox(user);
+    displayDualListBox(currentUser);
     
     // 활동 타임라인 표시
-    displayActivities(user);
+    displayActivities(currentUser);
 }
 
 async function displayDualListBox(user) {
