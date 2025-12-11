@@ -1,0 +1,29 @@
+# 환경 변수 (절대 커밋하지 않음)
+.env
+.env.local
+.env.*.local
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# AWS 자격 증명
+.aws/
+aws-credentials.json
+
+# 로그
+logs/
+*.log
+
+# 임시 파일
+*.tmp
+*.temp
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

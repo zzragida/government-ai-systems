@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제주특별자치도 AI 시스템</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="warning-banner">
+        <p>⚠️ 본 사이트는 OpenHash 기술 실증 및 테스트용이며, 실제 정부 서비스가 아닙니다.</p>
+        <div class="banner-links">
+            <a href="http://100.30.14.224/openhash-system/">OpenHash</a>
+            <a href="http://100.30.14.224/national-data-registry/">국가 데이터처</a>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>🍊 제주특별자치도 AI 시스템</h1>
+                <p>Jeju Special Self-Governing Province AI System</p>
+            </div>
+            <div class="auth-section">
+                <span id="user-display-name" class="user-display-name" style="display: none; color: white; font-weight: 600; margin-right: 16px;"></span>
+                <div id="auth-logged-out" class="auth-buttons" style="display: flex;">
+                    <button class="auth-btn login-btn" onclick="openLoginModal()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                        </svg>
+                        로그인
+                    </button>
+                </div>
+                <div id="auth-logged-in" class="auth-status" style="display: none;">
+                    <span class="auth-user-info">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                        </svg>
+                    </span>
+                    <button class="auth-btn mypage-btn" onclick="showMyPage(); setTimeout(function(){ if(typeof loadMyPageData !== 'undefined') loadMyPageData(); }, 200);" style="margin-right: 8px;">My Page</button>
+                    <button class="auth-btn logout-btn" onclick="logout()">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="dochung">제주도청</button>
+        <button class="tab-btn" data-tab="jejusi">제주시청</button>
+        <button class="tab-btn" data-tab="seogwipo">서귀포시청</button>
+        <button class="tab-btn" data-tab="openhash">오픈해시</button>
+        <button class="tab-btn" data-tab="overview">시스템 소개</button>
+    </nav>
+        </div>
+
+    <main class="main-content">
+        <div id="overview" class="tab-content"></div>
+        
+        
+        <div id="mypage" class="tab-content">
+<style>
+    .mypage-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .documents-section {
+        background: white;
+        border: 1px solid #d5d5d5;
+        border-radius: 8px;
+        padding: 32px;
+        margin-bottom: 40px;
+    }
+
+    .docs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .doc-card {
+        background: linear-gradient(135deg, #f5f8fb 0%, #ffffff 100%);
+        border: 2px solid #d5d5d5;
+        border-radius: 8px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+    }
+
+    .doc-card:hover {
+        border-color: #003d82;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,61,130,0.15);
+    }
+
+    .doc-card.has-doc {
+        border-color: #2e7d32;
+        background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+    }
+
+    .doc-icon {
+        font-size: 2em;
+    }
+
+    .doc-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9em;
+    }
+
+    .doc-status {
+        font-size: 0.75em;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .doc-card.has-doc .doc-status {
+        background: #c8e6c9;
+        color: #1b5e20;
+    }
+
+    .doc-card.no-doc .doc-status {
+        background: #ffcdd2;
+        color: #b71c1c;
+    }
+
+    .activities-section {
+        background: white;
+        border: 1px solid #d5d5d5;
+        border-radius: 8px;
+        padding: 32px;
+    }
+
+    .activity-item {
+        background: #f9f9f9;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 12px;
+        border-left: 3px solid #003d82;
+    }
+
+    .activity-number {
+        display: inline-block;
+        background: #003d82;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        max-width: 500px;
+        width: 90%;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 30px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    .modal-body {
+        padding: 30px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 20px 30px;
+        border-top: 1px solid #ecf0f1;
+    }
+
+    .action-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .action-btn {
+        padding: 12px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .action-btn:hover {
+        border-color: #003d82;
+        background: #f5f8fb;
+        transform: translateX(5px);
+    }
+
+    .recipient-item {
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .recipient-item:hover {
+        border-color: #003d82;
+        background: #f5f8fb;
+    }
+
+    .recipient-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+    .recipient-info {
+        font-size: 0.85em;
+        color: #666;
+    }
+</style>
+
+<div class="mypage-container">
+    <!-- 필요 서류 섹션 -->
+    <div class="documents-section">
+        <h2 style="margin: 0 0 20px 0; font-size: 1.3em;">📄 보유 서류</h2>
+        <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+            ⚠️ 이 서류들은 본인만 접근할 수 있습니다. 서류를 클릭하여 열람, 전송, 갱신하세요.
+        </p>
+        <div id="required-docs-container"></div>
+    </div>
+
+    <!-- 활동 타임라인 섹션 -->
+    <div class="activities-section">
+        <h2 style="margin: 0 0 20px 0; font-size: 1.3em;">📋 PDV 활동 타임라인</h2>
+        <input type="text" id="activity-search" placeholder="활동 검색..." 
+               style="padding: 8px 12px; border: 1px solid #d5d5d5; border-radius: 4px; width: 300px; margin-bottom: 20px;">
+        <div id="activities-list"></div>
+        <div id="create-hash-btn-container"></div>
+    </div>
+</div>
+
+<!-- 서류 추가 모달 -->
+<div id="add-document-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin: 0;">📄 서류 추가</h2>
+            <button onclick="closeAddDocumentModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #95a5a6;">×</button>
+        </div>
+        <div class="modal-body">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">서류 종류 검색</label>
+            <input type="text" id="document-name-input" list="document-list" 
+                   placeholder="서류 이름을 입력하거나 선택하세요"
+                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+            <datalist id="document-list"></datalist>
+            <div style="margin-top: 20px; color: #7f8c8d; font-size: 13px;">
+                💡 드롭다운에서 서류를 선택하거나 직접 입력할 수 있습니다.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeAddDocumentModal()" style="padding: 10px 20px; background: #ecf0f1; border: none; border-radius: 6px; cursor: pointer;">취소</button>
+            <button onclick="addDocumentToPDV()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">추가</button>
+        </div>
+    </div>
+</div>
+
+<!-- 서류 액션 모달 -->
+<div id="document-action-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin: 0;" id="action-modal-title">📄 서류 관리</h2>
+            <button onclick="closeDocumentActionModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #95a5a6;">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="action-menu">
+                <button class="action-btn" onclick="handleDocumentView()">
+                    👁️ 열람
+                </button>
+                <button class="action-btn" onclick="showRecipientSelector()">
+                    📤 전송
+                </button>
+                <button class="action-btn" onclick="handleDocumentRenew()">
+                    🔄 갱신
+                </button>
+                <button class="action-btn" onclick="handleDocumentDelete()" style="border-color: #e74c3c; color: #e74c3c;">
+                    🗑️ 삭제
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 수신자 선택 모달 -->
+<div id="recipient-selector-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin: 0;">📤 수신자 선택</h2>
+            <button onclick="closeRecipientSelectorModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #95a5a6;">×</button>
+        </div>
+        <div class="modal-body">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">수신자 검색 (이름 또는 전화번호)</label>
+            <input type="text" id="recipient-search-input" 
+                   placeholder="이름 또는 전화번호로 검색..."
+                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
+            
+            <div id="recipient-list" style="max-height: 300px; overflow-y: auto;">
+                <!-- 수신자 목록이 여기에 표시됩니다 -->
+            </div>
+
+            <div style="margin-top: 20px; color: #7f8c8d; font-size: 13px;">
+                💡 검색하여 수신자를 선택하세요.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeRecipientSelectorModal()" style="padding: 10px 20px; background: #ecf0f1; border: none; border-radius: 6px; cursor: pointer;">취소</button>
+        </div>
+    </div>
+</div>
+        <div id="openhash" class="tab-content"></div>
+        <div id="dochung" class="tab-content active"></div>
+        <div id="jejusi" class="tab-content"></div>
+        <div id="seogwipo" class="tab-content"></div>
+    </main>
+
+    <button id="floating-help-btn" class="floating-help-btn" title="AI 상담">?</button>
+
+    <div id="general-chat-panel" class="general-chat-panel">
+        <div class="general-chat-header">
+            <div class="general-chat-title">🍊 제주 AI 상담</div>
+            <button id="general-chat-close" class="general-chat-close">×</button>
+        </div>
+        <div id="general-chat-messages" class="general-chat-messages">
+            <div class="general-chat-message assistant">
+                <div class="general-chat-bubble">안녕하세요! 제주특별자치도 AI 상담 서비스입니다. 무엇을 도와드릴까요?</div>
+            </div>
+        </div>
+        <div class="general-chat-input-area">
+            <input type="text" id="general-chat-input" class="general-chat-input" placeholder="질문을 입력하세요..." />
+            <button id="general-chat-send" class="general-chat-send">전송</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 제주특별자치도 AI 시스템 - OpenHash 기술 실증</p>
+    </footer>
+
+    <script src="js/api-client.js"></script>
+    <script src="js/pdv-manager.js"></script>
+    <script src="js/transfer-manager.js"></script>
+    <script src="js/transfer-ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/citizen-documents-data.js"></script>
+    <script src="js/organization-types-data.js"></script>
+    <script src="js/mypage.js"></script>
+    <script src="js/pdv-debug.js"></script>
+    <script src="js/citizen-data.js"></script>
+    <script src="js/organization-manager.js"></script>
+    <script src="js/organization-data.js"></script>
+    <script src="js/data/dochung.js"></script>
+    <script src="js/data/jejusi.js"></script>
+    <script src="js/data/seogwipo.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/openhash-manager.js"></script>
+    <script src="js/main.js"></script>
+<!-- 로그인 모달 -->
+
+<!-- 모달 CSS 스타일 -->
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 32px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    position: relative;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal .close {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal .close:hover,
+.modal .close:focus {
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #003d82;
+    box-shadow: 0 0 0 3px rgba(0,61,130,0.1);
+}
+
+.form-group small {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 4px;
+    display: block;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background: #003d82;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.2s;
+}
+
+button[type="submit"]:hover {
+    background: #002a5c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,61,130,0.3);
+}
+</style>
+
+<!-- 로그인 모달 -->
+<div id="login-modal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <button class="close" onclick="closeLoginModal()">&times;</button>
+        <h2 style="margin-bottom: 24px; text-align: center;">📱 PDV 로그인</h2>
+        <p style="color: #666; margin-bottom: 32px; text-align: center;">
+            전화번호로 Private Data Vault에 접근합니다.
+        </p>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label>전화번호</label>
+                <input type="tel" id="login-phone" required placeholder="064-123-4567" autocomplete="tel">
+                <small>등록된 전화번호를 입력하세요</small>
+            </div>
+            
+            <button type="submit">로그인</button>
+        </form>
+    </div>
+</div>
+
+<div id="pdv-create-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close" onclick="closePDVCreateModal()">&times;</span>
+        
+        <div id="pdv-step-1" class="pdv-step">
+            <h2 style="margin-bottom: 24px;">🆕 PDV 생성</h2>
+            <p style="color: #666; margin-bottom: 32px;">
+                등록되지 않은 전화번호입니다.<br>
+                새로운 Private Data Vault를 생성하시겠습니까?
+            </p>
+            
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <button class="pdv-type-btn" onclick="selectPDVType('citizen')" style="flex: 1; padding: 40px 20px; background: white; border: 2px solid #d5d5d5; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <div style="font-size: 3em; margin-bottom: 12px;">🙋</div>
+                    <div style="font-size: 1.2em; font-weight: 600; color: #003d82;">개인</div>
+                    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">개인 도민</div>
+                </button>
+                
+                <button class="pdv-type-btn" onclick="selectPDVType('organization')" style="flex: 1; padding: 40px 20px; background: white; border: 2px solid #d5d5d5; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <div style="font-size: 3em; margin-bottom: 12px;">🏢</div>
+                    <div style="font-size: 1.2em; font-weight: 600; color: #003d82;">단체</div>
+                    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">법인/단체/협회</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 개인 정보 입력 -->
+        <div id="pdv-step-2-citizen" class="pdv-step" style="display: none;">
+            <h2 style="margin-bottom: 24px;">🙋 개인 정보 입력</h2>
+            
+            <form id="citizen-form" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">이름 *</label>
+                    <input type="text" id="citizen-name" required style="width: 100%; padding: 12px; border: 1px solid #d5d5d5; border-radius: 4px; font-size: 1em;">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">주소 *</label>
+                    <input type="text" id="citizen-address" required placeholder="제주특별자치도 ..." style="width: 100%; padding: 12px; border: 1px solid #d5d5d5; border-radius: 4px; font-size: 1em;">
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="button" onclick="backToStep1()" style="flex: 1; padding: 12px; background: white; color: #666; border: 1px solid #d5d5d5; border-radius: 4px; cursor: pointer; font-size: 1em;">
+                        ← 뒤로
+                    </button>
+                    <button type="submit" style="flex: 2; padding: 12px; background: #003d82; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 1em;">
+                        PDV 생성하기
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 단체 정보 입력 -->
+        <div id="pdv-step-2-organization" class="pdv-step" style="display: none;">
+            <h2 style="margin-bottom: 24px;">🏢 단체 정보 입력</h2>
+            
+            <form id="organization-form" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">단체 종류 *</label>
+                    <input list="org-types" id="organization-type" required placeholder="검색 또는 선택..." style="width: 100%; padding: 12px; border: 1px solid #d5d5d5; border-radius: 4px; font-size: 1em;">
+                    <datalist id="org-types"></datalist>
+                    <small style="color: #666; margin-top: 4px; display: block;">예: 주식회사, 사단법인, 협동조합 등</small>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">단체명 *</label>
+                    <input type="text" id="organization-name" required placeholder="(주)제주관광..." style="width: 100%; padding: 12px; border: 1px solid #d5d5d5; border-radius: 4px; font-size: 1em;">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">주소 *</label>
+                    <input type="text" id="organization-address" required placeholder="제주특별자치도 ..." style="width: 100%; padding: 12px; border: 1px solid #d5d5d5; border-radius: 4px; font-size: 1em;">
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="button" onclick="backToStep1()" style="flex: 1; padding: 12px; background: white; color: #666; border: 1px solid #d5d5d5; border-radius: 4px; cursor: pointer; font-size: 1em;">
+                        ← 뒤로
+                    </button>
+                    <button type="submit" style="flex: 2; padding: 12px; background: #003d82; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 1em;">
+                        PDV 생성하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.pdv-type-btn:hover {
+    border-color: #003d82 !important;
+    background: #f5f8fb !important;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,61,130,0.15);
+}
+
+.pdv-step {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<script>
+// PDV 생성 모달 관련 함수들
+let selectedPDVType = null;
+let pendingPhoneNumber = null;
+
+function showPDVCreateModal(phoneNumber) {
+    pendingPhoneNumber = phoneNumber;
+    document.getElementById('pdv-create-modal').style.display = 'block';
+    document.getElementById('pdv-step-1').style.display = 'block';
+    document.getElementById('pdv-step-2-citizen').style.display = 'none';
+    document.getElementById('pdv-step-2-organization').style.display = 'none';
+    
+    // 단체 종류 드롭다운 초기화
+    populateOrgTypes();
+}
+
+function closePDVCreateModal() {
+    document.getElementById('pdv-create-modal').style.display = 'none';
+    selectedPDVType = null;
+    pendingPhoneNumber = null;
+}
+
+function selectPDVType(type) {
+    selectedPDVType = type;
+    document.getElementById('pdv-step-1').style.display = 'none';
+    
+    if (type === 'citizen') {
+        document.getElementById('pdv-step-2-citizen').style.display = 'block';
+    } else {
+        document.getElementById('pdv-step-2-organization').style.display = 'block';
+    }
+}
+
+function backToStep1() {
+    document.getElementById('pdv-step-1').style.display = 'block';
+    document.getElementById('pdv-step-2-citizen').style.display = 'none';
+    document.getElementById('pdv-step-2-organization').style.display = 'none';
+    selectedPDVType = null;
+}
+
+function populateOrgTypes() {
+    const datalist = document.getElementById('org-types');
+    datalist.innerHTML = '';
+    
+    // 카테고리별로 그룹화하여 표시
+    for (const [category, types] of Object.entries(window.ORGANIZATION_CATEGORIES)) {
+        types.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = `${type} (${category})`;
+            datalist.appendChild(option);
+        });
+    }
+}
+
+// 개인 폼 제출
+document.addEventListener('DOMContentLoaded', function() {
+    const citizenForm = document.getElementById('citizen-form');
+    if (citizenForm) {
+        citizenForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('citizen-name').value;
+            const address = document.getElementById('citizen-address').value;
+            
+            const pdvData = {
+                phoneNumber: pendingPhoneNumber,
+                type: 'citizen',
+                personData: {
+                    name: name,
+                    address: address
+                }
+            };
+            
+            if (window.authManager) {
+                await window.authManager.createPDV(pdvData);
+                closePDVCreateModal();
+                alert('✅ PDV가 생성되었습니다!\n로그인되었습니다.');
+            }
+        });
+    }
+    
+    // 단체 폼 제출
+    const organizationForm = document.getElementById('organization-form');
+    if (organizationForm) {
+        organizationForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const orgType = document.getElementById('organization-type').value;
+            const orgName = document.getElementById('organization-name').value;
+            const orgAddress = document.getElementById('organization-address').value;
+            
+            // 단체 종류 유효성 검사
+            if (!window.ORGANIZATION_TYPES[orgType]) {
+                alert('올바른 단체 종류를 선택해주세요.');
+                return;
+            }
+            
+            const pdvData = {
+                phoneNumber: pendingPhoneNumber,
+                type: 'organization',
+                orgData: {
+                    name: orgName,
+                    orgType: orgType,
+                    address: orgAddress
+                }
+            };
+            
+            if (window.authManager) {
+                await window.authManager.createPDV(pdvData);
+                closePDVCreateModal();
+                alert('✅ PDV가 생성되었습니다!\n로그인되었습니다.');
+            }
+        });
+    }
+});
+
+// 모달 외부 클릭 시 닫기
+window.onclick = function(event) {
+    const pdvModal = document.getElementById('pdv-create-modal');
+    if (event.target === pdvModal) {
+        closePDVCreateModal();
+    }
+}
+</script>
